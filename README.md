@@ -62,10 +62,10 @@ Full documentation is in the **`docs/`** folder (and can be published as a GitHu
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React, TypeScript, Chart.js |
-| Backend | Spring Boot, Java 17 |
+| Frontend | React 18, TypeScript, Chart.js |
+| Backend | Spring Boot 3.4, Java 21 |
 | Database | MariaDB/MySQL |
-| Ingestor | Python 3.11 |
+| Ingestor | Python 3.12 |
 | DevOps | Docker, GitHub Actions |
 
 ## Project Structure

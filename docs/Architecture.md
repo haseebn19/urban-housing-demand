@@ -21,7 +21,7 @@ Urban Housing Demand is a full-stack web application with four main components:
 ### Frontend (React + TypeScript)
 
 - **Purpose:** Interactive data visualization
-- **Key Libraries:** Chart.js, React 17
+- **Key Libraries:** Chart.js, React 18
 - **Features:** Dark/light theme, responsive charts
 
 ### Backend (Spring Boot)
@@ -67,7 +67,7 @@ Scheduler → Ingestor → External API
 
 | Service | Image | Ports |
 |---------|-------|-------|
-| frontend | Node 18 | 3000 |
-| backend | Eclipse Temurin 17 | 8080 |
+| frontend | Node 20 | 3000 |
+| backend | Eclipse Temurin 21 | 8080 |
 | database | MariaDB 10.11 | 3306 |
-| ingestor | Python 3.11 | - |
+| ingestor | Python 3.12 | - |

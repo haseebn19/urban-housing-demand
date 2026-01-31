@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
@@ -17,4 +17,4 @@ RUN chown -R appuser:appgroup /app
 USER appuser
 
 # Run ruff (lint) first, then tests
-CMD sh -c "ruff check . && python -m pytest tests/test.py -v --cov=. --cov-report=term-missing"
+CMD sh -c "ruff check . && python -m pytest tests/ -v --cov=. --cov-report=term-missing"

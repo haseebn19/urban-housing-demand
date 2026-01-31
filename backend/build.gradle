@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.2'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'jacoco'
     id 'checkstyle'
 }
@@ -11,8 +11,8 @@ version = '1.0'
 archivesBaseName = 'urban-housing-demand'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
@@ -31,16 +31,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     
     // Database - use newer MySQL connector artifact
-    runtimeOnly 'com.mysql:mysql-connector-j:8.3.0'
+    runtimeOnly 'com.mysql:mysql-connector-j:9.1.0'
     
     // API Documentation
-    runtimeOnly 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    runtimeOnly 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.mockito:mockito-core:5.10.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.15.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
     
     // H2 database for integration tests
     testRuntimeOnly 'com.h2database:h2:2.2.224'
@@ -61,7 +61,7 @@ jacocoTestReport {
 }
 
 checkstyle {
-    toolVersion = '10.12.7'
+    toolVersion = '10.21.2'
     configFile = file('config/checkstyle/checkstyle.xml')
 }
 
