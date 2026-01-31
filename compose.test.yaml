@@ -1,0 +1,20 @@
+# Docker Compose for running all tests
+# Usage: docker compose -f compose.test.yaml up --build --abort-on-container-exit
+
+services:
+  test-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.test
+    environment:
+      - CI=true
+
+  test-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+
+  test-ingestor:
+    build:
+      context: ./ingestor
+      dockerfile: Dockerfile.test

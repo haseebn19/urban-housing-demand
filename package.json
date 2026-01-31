@@ -1,0 +1,12 @@
+{
+  "name": "urban-housing-demand",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-stack housing demand visualization for Toronto and Hamilton",
+  "scripts": {
+    "test": "docker compose -f compose.test.yaml up --build --abort-on-container-exit",
+    "start": "docker compose up -d",
+    "stop": "docker compose down",
+    "build": "docker compose build"
+  }
+}

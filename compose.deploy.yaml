@@ -1,0 +1,108 @@
+# Docker Compose for Production Deployment
+# Usage: docker compose -f compose.deploy.yaml up -d
+
+services:
+  # Reverse proxy with SSL
+  swag:
+    image: lscr.io/linuxserver/swag:latest
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - URL=${DOMAIN_URL:-example.socs.uoguelph.ca}
+      - VALIDATION=http
+      - STAGING=${STAGING:-false}
+    volumes:
+      - ./swag/config:/config
+    ports:
+      - "443:443"
+      - "80:80"
+    depends_on:
+      frontend:
+        condition: service_healthy
+    networks:
+      - swag-frontend
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      - DB_ADDRESS=jdbc:mysql://database:3306
+      - DB_DATABASE=${DB_DATABASE:-template_db}
+      - DB_USER=${DB_USER:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-pwd}
+    networks:
+      - backend-database
+      - backend-frontend
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+
+  database:
+    build: ./database
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-pwd}
+      - MYSQL_DATABASE=${DB_DATABASE:-template_db}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - backend-database
+      - ingester-database
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-pwd}" ]
+      interval: 10s
+      retries: 15
+      start_period: 40s
+      timeout: 5s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    environment:
+      - BACKEND_PROXY=http://backend:8080
+    networks:
+      - backend-frontend
+      - swag-frontend
+    depends_on:
+      - backend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+  ingestor:
+    build: ./ingestor
+    environment:
+      - DB_HOST=database
+      - DB_DATABASE=${DB_DATABASE:-template_db}
+      - DB_USER=${DB_USER:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-pwd}
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - ingester-database
+    restart: "no"
+
+volumes:
+  mariadb_data:
+    name: urban_housing_demand_production_data
+
+networks:
+  backend-database:
+  backend-frontend:
+  ingester-database:
+  swag-frontend:
