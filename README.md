@@ -20,6 +20,11 @@ A full-stack web application for visualizing housing and labour market data for 
 # Clone and start
 git clone https://github.com/haseebn19/urban-housing-demand.git
 cd urban-housing-demand
+
+# Set required database password (no default for security)
+export DB_PASSWORD=your_secure_password   # Linux/macOS
+# Or: $env:DB_PASSWORD="your_secure_password"  # PowerShell
+
 docker compose up -d
 
 # Open http://localhost:3000
@@ -28,7 +33,7 @@ docker compose up -d
 ## Commands
 
 ```bash
-# Start application
+# Start application (DB_PASSWORD required)
 docker compose up -d
 
 # Run all tests
@@ -43,15 +48,15 @@ docker compose logs -f
 
 ## Documentation
 
-See the [Wiki](../../wiki) for detailed documentation:
+Full documentation is in the **`docs/`** folder (and can be published as a GitHub Wiki):
 
-- [Getting Started](../../wiki/Getting-Started) - Installation and setup
-- [Architecture](../../wiki/Architecture) - System design overview
-- [API Reference](../../wiki/API-Reference) - REST endpoints
-- [Database Schema](../../wiki/Database-Schema) - Tables and mappings
-- [Development Guide](../../wiki/Development-Guide) - Contributing
-
-> **Note:** Documentation source files are in the `docs/` folder.
+| Doc | Description |
+|-----|-------------|
+| [Getting Started](docs/Getting-Started.md) | Installation, env vars, basic commands |
+| [Architecture](docs/Architecture.md) | System design and components |
+| [API Reference](docs/API-Reference.md) | REST endpoints |
+| [Database Schema](docs/Database-Schema.md) | Tables and mappings |
+| [Development Guide](docs/Development-Guide.md) | Contributing, local dev, CI/CD |
 
 ## Tech Stack
 
@@ -71,8 +76,9 @@ urban-housing-demand/
 ├── backend/           # Spring Boot API
 ├── database/          # SQL schema & seed data
 ├── ingestor/          # Python data loader
-├── docs/              # Documentation
-└── compose.yaml       # Docker orchestration
+├── docs/              # Documentation source
+├── .env.example       # Example env (copy to .env)
+└── compose.yaml      # Docker orchestration
 ```
 
 ## Contributing

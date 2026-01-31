@@ -45,15 +45,16 @@ docker compose up -d --build
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` to customize:
+Copy `.env.example` to `.env` and set at least `DB_PASSWORD`:
 
 ```bash
 cp .env.example .env
+# Edit .env and set DB_PASSWORD=your_secure_password
 ```
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DB_DATABASE` | template_db | Database name |
-| `DB_USER` | root | Database user |
-| `DB_PASSWORD` | pwd | Database password |
-| `API_KEY` | _(empty)_ | External API key (optional) |
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DB_PASSWORD` | **Yes** | _(none)_ | Database password |
+| `DB_DATABASE` | No | urban_housing_demand | Database name |
+| `DB_USER` | No | root | Database user |
+| `API_KEY` | No | _(empty)_ | External API key (optional) |

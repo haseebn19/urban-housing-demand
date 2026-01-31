@@ -85,7 +85,9 @@ docker compose exec frontend sh
 ### Database Access
 
 ```bash
-docker compose exec database mysql -u root -ppwd template_db
+# Linux/macOS (use your DB_PASSWORD)
+docker compose exec database mysql -u root -p"$DB_PASSWORD" urban_housing_demand
+# Or run without -p and enter password when prompted
 ```
 
 ## CI/CD
