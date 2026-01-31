@@ -247,6 +247,10 @@ jobs:
 
       - name: Build Docker images
         run: docker compose build
+        env:
+          DB_PASSWORD: ci_build_placeholder
 
       - name: Verify images
         run: docker compose config
+        env:
+          DB_PASSWORD: ci_build_placeholder
