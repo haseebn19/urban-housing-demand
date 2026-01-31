@@ -6,7 +6,6 @@ import com.example.cis4900.spring.template.housing.models.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +22,6 @@ public class HousingServiceImpl implements HousingService {
         private final HousingStartsCompletionsDao housingDao;
         private final LabourMarketDao labourDao;
 
-        @Autowired
         public HousingServiceImpl(HousingStartsCompletionsDao housingDao, LabourMarketDao labourDao) {
                 this.housingDao = housingDao;
                 this.labourDao = labourDao;

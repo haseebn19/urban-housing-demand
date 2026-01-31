@@ -5,7 +5,6 @@ import com.example.cis4900.spring.template.housing.dto.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +12,7 @@ import java.util.List;
 
 /**
  * REST controller for housing and labour market data endpoints.
+ * Exception handling is delegated to GlobalExceptionHandler.
  */
 @RestController
 @RequestMapping(path = "/api/housing")
@@ -23,7 +23,6 @@ public class HousingController {
 
     private final HousingService housingService;
 
-    @Autowired
     public HousingController(HousingService housingService) {
         this.housingService = housingService;
     }
@@ -31,76 +30,61 @@ public class HousingController {
     /**
      * Retrieves total starts and completions data from the
      * housing_starts_completions table.
+     *
+     * @return list of housing total DTOs
      */
     @GetMapping("/starts-completions/total")
     public ResponseEntity<List<HousingTotalDto>> getHousingTotals() {
         logger.info("GET /api/housing/starts-completions/total");
-        try {
-            List<HousingTotalDto> data = housingService.getHousingTotals();
-            return ResponseEntity.ok(data);
-        } catch (Exception e) {
-            logger.error("Error fetching housing totals", e);
-            return ResponseEntity.internalServerError().build();
-        }
+        List<HousingTotalDto> data = housingService.getHousingTotals();
+        return ResponseEntity.ok(data);
     }
 
     /**
      * Retrieves completion ratio data calculated from starts and completions.
+     *
+     * @return list of housing ratio DTOs
      */
     @GetMapping("/starts-completions/ratio")
     public ResponseEntity<List<HousingRatioDto>> getHousingRatios() {
         logger.info("GET /api/housing/starts-completions/ratio");
-        try {
-            List<HousingRatioDto> data = housingService.getHousingRatios();
-            return ResponseEntity.ok(data);
-        } catch (Exception e) {
-            logger.error("Error fetching housing ratios", e);
-            return ResponseEntity.internalServerError().build();
-        }
+        List<HousingRatioDto> data = housingService.getHousingRatios();
+        return ResponseEntity.ok(data);
     }
 
     /**
      * Retrieves occupation distribution from labour market data.
+     *
+     * @return list of occupation DTOs
      */
     @GetMapping("/labour-market/occupation")
     public ResponseEntity<List<OccupationDto>> getLabourMarketOccupations() {
         logger.info("GET /api/housing/labour-market/occupation");
-        try {
-            List<OccupationDto> data = housingService.getLabourMarketOccupations();
-            return ResponseEntity.ok(data);
-        } catch (Exception e) {
-            logger.error("Error fetching labour market occupations", e);
-            return ResponseEntity.internalServerError().build();
-        }
+        List<OccupationDto> data = housingService.getLabourMarketOccupations();
+        return ResponseEntity.ok(data);
     }
 
     /**
      * Retrieves family type distribution from labour market data.
+     *
+     * @return list of family type DTOs
      */
     @GetMapping("/labour-market/family-type")
     public ResponseEntity<List<FamilyTypeDto>> getLabourMarketFamilyTypes() {
         logger.info("GET /api/housing/labour-market/family-type");
-        try {
-            List<FamilyTypeDto> data = housingService.getLabourMarketFamilyTypes();
-            return ResponseEntity.ok(data);
-        } catch (Exception e) {
-            logger.error("Error fetching labour market family types", e);
-            return ResponseEntity.internalServerError().build();
-        }
+        List<FamilyTypeDto> data = housingService.getLabourMarketFamilyTypes();
+        return ResponseEntity.ok(data);
     }
 
     /**
      * Retrieves immigration data from labour market.
+     *
+     * @return list of immigration DTOs
      */
     @GetMapping("/labour-market/immigration-data")
     public ResponseEntity<List<ImmigrationDto>> getImmigrationData() {
         logger.info("GET /api/housing/labour-market/immigration-data");
-        try {
-            List<ImmigrationDto> data = housingService.getImmigrationData();
-            return ResponseEntity.ok(data);
-        } catch (Exception e) {
-            logger.error("Error fetching immigration data", e);
-            return ResponseEntity.internalServerError().build();
-        }
+        List<ImmigrationDto> data = housingService.getImmigrationData();
+        return ResponseEntity.ok(data);
     }
 }

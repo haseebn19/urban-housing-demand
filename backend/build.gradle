@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.1.3'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version '3.2.2'
+    id 'io.spring.dependency-management' version '1.1.4'
     id 'jacoco'
     id 'checkstyle'
 }
@@ -20,7 +20,7 @@ repositories {
 }
 
 jacoco {
-    toolVersion = '0.8.11'
+    toolVersion = '0.8.12'
 }
 
 dependencies {
@@ -28,18 +28,22 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     
-    // Database
-    runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+    // Database - use newer MySQL connector artifact
+    runtimeOnly 'com.mysql:mysql-connector-j:8.3.0'
     
     // API Documentation
-    runtimeOnly 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+    runtimeOnly 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.mockito:mockito-core:5.5.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    
+    // H2 database for integration tests
+    testRuntimeOnly 'com.h2database:h2:2.2.224'
 }
 
 test {
@@ -57,7 +61,7 @@ jacocoTestReport {
 }
 
 checkstyle {
-    toolVersion = '10.12.1'
+    toolVersion = '10.12.7'
     configFile = file('config/checkstyle/checkstyle.xml')
 }
 

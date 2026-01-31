@@ -1,5 +1,5 @@
-import React, {useEffect, useState, useMemo} from "react";
-import {Line} from "react-chartjs-2";
+import React, {useEffect, useState} from 'react';
+import {Line} from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,9 +9,10 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js";
-import {useTheme} from "../ThemeContext";
-import {getLabourMarketImmigration} from "../services/housingService";
+} from 'chart.js';
+import {getLabourMarketImmigration} from '../services/housingService';
+import {useChartOptions} from '../hooks/useChartOptions';
+import ChartCard from './ChartCard';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -22,11 +23,11 @@ interface ImmigrationEntry {
   immigrantStatus: string;
 }
 
-interface ImmigrationProps {
-  city: "Toronto" | "Hamilton";
+interface Props {
+  city: 'Toronto' | 'Hamilton';
 }
 
-interface ChartDataType {
+interface ChartData {
   labels: string[];
   datasets: {
     label: string;
@@ -37,25 +38,18 @@ interface ChartDataType {
   }[];
 }
 
-// City-specific colors
-const CITY_COLORS = {
-  Toronto: {
-    border: "rgba(255, 99, 132, 1)",
-    background: "rgba(255, 99, 132, 0.2)",
-  },
-  Hamilton: {
-    border: "rgba(75, 192, 192, 1)",
-    background: "rgba(75, 192, 192, 0.2)",
-  },
+const COLORS = {
+  Toronto: {border: '#f43f5e', bg: 'rgba(244, 63, 94, 0.2)'},
+  Hamilton: {border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.2)'},
 };
 
-const Immigration: React.FC<ImmigrationProps> = ({city}) => {
-  const {theme} = useTheme();
-  const [chartData, setChartData] = useState<ChartDataType | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+const Immigration: React.FC<Props> = ({city}) => {
+  const [chartData, setChartData] = useState<ChartData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const colors = CITY_COLORS[city];
+  const colors = COLORS[city];
+  const chartOptions = useChartOptions({title: `Immigration Trends in ${city}`});
 
   useEffect(() => {
     let isMounted = true;
@@ -72,52 +66,49 @@ const Immigration: React.FC<ImmigrationProps> = ({city}) => {
 
         if (cityData.length === 0) {
           setChartData(null);
-          setError(`No immigration data available for ${city}`);
+          setError(`No immigration data available for ${city}.`);
           return;
         }
 
-        // Count total immigrants per (year, month)
-        const groupedMap = new Map<string, {year: number; month: number; totalImmigrants: number}>();
+        // Count immigrants per year-month
+        const grouped = new Map<string, {year: number; month: number; count: number}>();
 
-        for (const entry of cityData) {
-          if (entry.immigrantStatus !== "Immigrant") continue;
-          const ymKey = `${entry.year}-${entry.month}`;
+        for (const item of cityData) {
+          if (item.immigrantStatus !== 'Immigrant') continue;
+          const key = `${item.year}-${item.month}`;
 
-          if (!groupedMap.has(ymKey)) {
-            groupedMap.set(ymKey, {year: entry.year, month: entry.month, totalImmigrants: 0});
+          if (!grouped.has(key)) {
+            grouped.set(key, {year: item.year, month: item.month, count: 0});
           }
-          groupedMap.get(ymKey)!.totalImmigrants += 1;
+          const groupedEntry = grouped.get(key);
+          if (groupedEntry) groupedEntry.count += 1;
         }
 
-        // Convert to sorted array
-        const groupedArray = Array.from(groupedMap.values()).sort((a, b) => {
-          return a.year * 100 + a.month - (b.year * 100 + b.month);
-        });
+        const sorted = Array.from(grouped.values()).sort(
+          (a, b) => a.year * 100 + a.month - (b.year * 100 + b.month)
+        );
 
-        if (groupedArray.length === 0) {
+        if (sorted.length === 0) {
           setChartData(null);
-          setError(`No immigrant data found for ${city}`);
+          setError(`No immigrant records found for ${city}.`);
           return;
         }
 
         setChartData({
-          labels: groupedArray.map(
-            (item) => `${item.year}-${String(item.month).padStart(2, "0")}`
-          ),
+          labels: sorted.map((item) => `${item.year}-${String(item.month).padStart(2, '0')}`),
           datasets: [
             {
-              label: `Total Immigrants (${city})`,
-              data: groupedArray.map((item) => item.totalImmigrants),
+              label: `Immigrants (${city})`,
+              data: sorted.map((item) => item.count),
               borderColor: colors.border,
-              backgroundColor: colors.background,
-              tension: 0.2,
+              backgroundColor: colors.bg,
+              tension: 0.3,
             },
           ],
         });
-      } catch (err) {
+      } catch {
         if (isMounted) {
-          setError("Failed to load immigration data");
-          console.error(`Error fetching ${city} immigration data:`, err);
+          setError('Failed to load immigration data.');
         }
       } finally {
         if (isMounted) {
@@ -127,94 +118,19 @@ const Immigration: React.FC<ImmigrationProps> = ({city}) => {
     }
 
     fetchData();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => {isMounted = false;};
   }, [city, colors]);
 
-  const chartOptions = useMemo(
-    () => ({
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: theme === "dark" ? "#ffffff" : "#000000",
-          },
-        },
-        title: {
-          display: true,
-          text: `Total Immigrants in ${city}`,
-          color: theme === "dark" ? "#ffffff" : "#000000",
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: theme === "dark" ? "#ffffff" : "#000000",
-          },
-        },
-        y: {
-          ticks: {
-            color: theme === "dark" ? "#ffffff" : "#000000",
-          },
-        },
-      },
-    }),
-    [theme, city]
-  );
-
-  const containerStyle = useMemo(
-    () => ({
-      maxWidth: "900px",
-      margin: "0 auto",
-      padding: "30px",
-      fontFamily: "Arial, sans-serif",
-      color: theme === "dark" ? "#f4f4f4" : "#000000",
-      backgroundColor: theme === "dark" ? "#1c1c1c" : "#ffffff",
-      borderRadius: "12px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-      textAlign: "center" as const,
-    }),
-    [theme]
-  );
-
-  const chartContainerStyle = useMemo(
-    () => ({
-      backgroundColor: theme === "dark" ? "#2c2c2c" : "#f8f8f8",
-      padding: "20px",
-      borderRadius: "8px",
-      height: "500px",
-    }),
-    [theme]
-  );
-
   return (
-    <section data-testid={`${city.toLowerCase()}-immigration`} style={containerStyle}>
-      <h1
-        style={{
-          textAlign: "center",
-          fontSize: "2.5rem",
-          marginBottom: "20px",
-          color: theme === "dark" ? "#ffffff" : "#000000",
-        }}
-      >
-        Immigration Trends ({city})
-      </h1>
-
-      <div style={chartContainerStyle}>
-        {loading ? (
-          <p>Loading chart data...</p>
-        ) : error ? (
-          <p style={{color: "red"}}>{error}</p>
-        ) : chartData ? (
-          <Line data={chartData} options={chartOptions} />
-        ) : (
-          <p>No data available.</p>
-        )}
-      </div>
-    </section>
+    <ChartCard
+      title={`Immigration Trends (${city})`}
+      testId={`${city.toLowerCase()}-immigration`}
+      loading={loading}
+      error={error}
+      hasData={chartData !== null}
+    >
+      {chartData && <Line data={chartData} options={chartOptions} />}
+    </ChartCard>
   );
 };
 

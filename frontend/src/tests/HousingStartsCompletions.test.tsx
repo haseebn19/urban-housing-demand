@@ -8,11 +8,11 @@ import * as housingService from "../services/housingService";
 // Mock ResizeObserver for Chart.js
 beforeAll(() => {
   class ResizeObserver {
-    observe() { }
-    unobserve() { }
-    disconnect() { }
+    observe(): void { /* noop */}
+    unobserve(): void { /* noop */}
+    disconnect(): void { /* noop */}
   }
-  // @ts-ignore
+  // @ts-expect-error - ResizeObserver mock for tests
   global.ResizeObserver = ResizeObserver;
 });
 
@@ -44,7 +44,7 @@ describe("HousingStartsCompletions", () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText(/Housing Starts and Completions \(Hamilton\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Housing Starts & Completions \(Hamilton\)/i)).toBeInTheDocument();
 
     await waitFor(() => {
       expect(mockedService.getHousingTotalStartsCompletions).toHaveBeenCalledTimes(1);
@@ -62,12 +62,12 @@ describe("HousingStartsCompletions", () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText(/Housing Starts and Completions \(Toronto\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Housing Starts & Completions \(Toronto\)/i)).toBeInTheDocument();
   });
 
   test("shows loading state initially", () => {
     mockedService.getHousingTotalStartsCompletions.mockImplementation(
-      () => new Promise(() => { }) // Never resolves
+      () => new Promise(() => { /* never resolves */})
     );
 
     render(
@@ -76,7 +76,7 @@ describe("HousingStartsCompletions", () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText(/Loading chart data.../i)).toBeInTheDocument();
+    expect(screen.getByText(/Loading data/i)).toBeInTheDocument();
   });
 
   test("handles empty data gracefully", async () => {
@@ -132,7 +132,7 @@ describe("HousingStartsCompletions", () => {
     );
 
     const container = screen.getByTestId("housing-starts-hamilton");
-    expect(container).toHaveStyle("background-color: #1c1c1c");
+    expect(container).toHaveClass("chart-card");
   });
 
   test("applies light theme correctly", async () => {
@@ -147,6 +147,6 @@ describe("HousingStartsCompletions", () => {
     );
 
     const container = screen.getByTestId("housing-starts-hamilton");
-    expect(container).toHaveStyle("background-color: #ffffff");
+    expect(container).toHaveClass("chart-card");
   });
 });

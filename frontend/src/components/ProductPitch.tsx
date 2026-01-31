@@ -1,120 +1,63 @@
-import React, {useContext} from "react";
-import {ThemeContext} from "../ThemeContext";
+import React from 'react';
+import {useTheme} from '../ThemeContext';
+import './ProductPitch.css';
 
 const ProductPitch: React.FC = () => {
-  const themeContext = useContext(ThemeContext);
-  if (!themeContext) return null;
-
-  const {theme} = themeContext;
+  const {theme} = useTheme();
 
   return (
-    <section
-      data-testid="product-pitch"
-      style={{
-        maxWidth: "900px",
-        margin: "0 auto",
-        padding: "30px",
-        fontFamily: "Arial, sans-serif",
-        color: theme === "dark" ? "#f4f4f4" : "#000000",
-        backgroundColor: theme === "dark" ? "#1c1c1c" : "#ffffff",
-        borderRadius: "12px",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-        textAlign: "left",
-      }}
-    >
-      <h1
-        style={{
-          textAlign: "center",
-          fontSize: "2.5rem",
-          marginBottom: "20px",
-          color: theme === "dark" ? "#ffffff" : "#000000",
-        }}
-      >
-        Urban Housing Demand in Hamilton vs. Toronto
-      </h1>
-
-      <p
-        style={{
-          lineHeight: "1.8",
-          fontSize: "1.2rem",
-          marginBottom: "20px",
-          textAlign: "center",
-        }}
-      >
-        This project analyzes housing needs for different demographic groups and compares them with actual housing
-        developments in Hamilton and Toronto. The goal is to provide <strong>data-driven insights</strong> for real estate
-        investors, developers, and policymakers, ensuring <strong>sustainable housing growth</strong>.
-      </p>
-
-      {/* Themed Section */}
-      <div
-        style={{
-          marginBottom: "30px",
-          padding: "20px",
-          backgroundColor: theme === "dark" ? "#2c2c2c" : "#f8f8f8",
-          borderRadius: "8px",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "1.8rem",
-            color: theme === "dark" ? "#ffffff" : "#000000",
-            marginBottom: "15px",
-          }}
-        >
-          Key Objectives
-        </h2>
-        <ul
-          style={{
-            lineHeight: "1.8",
-            fontSize: "1.1rem",
-            marginLeft: "20px",
-          }}
-        >
-          <li>Analyze <strong>housing and employment data</strong> for Hamilton and Toronto.</li>
-          <li>Identify <strong>housing demand vs. supply gaps</strong> across demographic groups.</li>
-          <li>Develop <strong>interactive data visualizations</strong> for better decision-making.</li>
-        </ul>
+    <section className={`pitch ${theme}`} data-testid="product-pitch">
+      <div className="pitch__header">
+        <h1 className="pitch__title">Urban Housing Demand</h1>
+        <p className="pitch__subtitle">Hamilton vs. Toronto Analysis</p>
       </div>
 
-      {/* Another Themed Section */}
-      <div
-        style={{
-          padding: "20px",
-          backgroundColor: theme === "dark" ? "#2c2c2c" : "#f8f8f8",
-          borderRadius: "8px",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "1.8rem",
-            color: theme === "dark" ? "#ffffff" : "#000000",
-            marginBottom: "15px",
-          }}
-        >
-          Our Approach
-        </h2>
-        <p
-          style={{
-            lineHeight: "1.8",
-            fontSize: "1.1rem",
-            marginBottom: "15px",
-          }}
-        >
-          We analyze housing trends, employment statistics, and <strong>demographic shifts</strong> to provide
-          actionable insights. Our <strong>interactive dashboards</strong> help developers understand housing
-          needs across diverse populations.
-        </p>
-        <p
-          style={{
-            lineHeight: "1.8",
-            fontSize: "1.1rem",
-          }}
-        >
-          By focusing on <strong>Hamilton and Toronto</strong>, we aim to bridge the gap between <strong>housing supply
-            and demand</strong>, ensuring that developments meet the needs of <strong>singles, families, and
-              underrepresented communities</strong>.
-        </p>
+      <p className="pitch__intro">
+        This project analyzes housing needs for different demographic groups and compares them
+        with actual housing developments in Hamilton and Toronto. The goal is to provide{' '}
+        <strong>data-driven insights</strong> for real estate investors, developers, and policymakers.
+      </p>
+
+      <div className="pitch__grid">
+        <div className="pitch__card">
+          <h2 className="pitch__card-title">📊 Key Objectives</h2>
+          <ul className="pitch__list">
+            <li>Analyze <strong>housing and employment data</strong> for Hamilton and Toronto</li>
+            <li>Identify <strong>housing demand vs. supply gaps</strong> across demographic groups</li>
+            <li>Develop <strong>interactive visualizations</strong> for better decision-making</li>
+          </ul>
+        </div>
+
+        <div className="pitch__card">
+          <h2 className="pitch__card-title">🎯 Our Approach</h2>
+          <ul className="pitch__list">
+            <li>Analyze housing trends and <strong>demographic shifts</strong></li>
+            <li>Compare data between <strong>two major cities</strong></li>
+            <li>Bridge the gap between <strong>supply and demand</strong></li>
+          </ul>
+        </div>
+
+        <div className="pitch__card">
+          <h2 className="pitch__card-title">👥 Target Audiences</h2>
+          <ul className="pitch__list">
+            <li><strong>Real estate investors</strong> seeking market insights</li>
+            <li><strong>Developers</strong> planning new projects</li>
+            <li><strong>Policymakers</strong> ensuring sustainable growth</li>
+          </ul>
+        </div>
+
+        <div className="pitch__card">
+          <h2 className="pitch__card-title">📈 Data Sources</h2>
+          <ul className="pitch__list">
+            <li>Housing starts and completions data</li>
+            <li>Labour market statistics by occupation</li>
+            <li>Immigration and demographic trends</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="pitch__cta">
+        <p>Explore the data using the navigation above to discover insights about housing trends.</p>
       </div>
     </section>
   );

@@ -1,5 +1,12 @@
 # Docker Compose configuration for Urban Housing Demand application
 # Use: docker compose up -d
+#
+# Required environment variables:
+# - DB_PASSWORD: Database password (required, no default for security)
+#
+# Optional environment variables:
+# - DB_DATABASE: Database name (default: urban_housing_demand)
+# - DB_USER: Database user (default: root)
 
 services:
   backend:
@@ -8,9 +15,10 @@ services:
       - "8080:8080"
     environment:
       - DB_ADDRESS=jdbc:mysql://database:3306
-      - DB_DATABASE=${DB_DATABASE:-template_db}
+      - DB_DATABASE=${DB_DATABASE:-urban_housing_demand}
       - DB_USER=${DB_USER:-root}
-      - DB_PASSWORD=${DB_PASSWORD:-pwd}
+      - DB_PASSWORD=${DB_PASSWORD:?DB_PASSWORD is required}
+      - DDL_AUTO=${DDL_AUTO:-none}
     networks:
       - backend-database
       - backend-frontend
@@ -18,18 +26,18 @@ services:
       database:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
     restart: unless-stopped
 
   database:
     build: ./database
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-pwd}
-      - MYSQL_DATABASE=${DB_DATABASE:-template_db}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:?DB_PASSWORD is required}
+      - MYSQL_DATABASE=${DB_DATABASE:-urban_housing_demand}
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
@@ -38,7 +46,7 @@ services:
     ports:
       - "3306:3306"
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-pwd}" ]
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -56,7 +64,7 @@ services:
     depends_on:
       - backend
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -67,9 +75,10 @@ services:
     build: ./ingestor
     environment:
       - DB_HOST=database
-      - DB_DATABASE=${DB_DATABASE:-template_db}
+      - DB_DATABASE=${DB_DATABASE:-urban_housing_demand}
       - DB_USER=${DB_USER:-root}
-      - DB_PASSWORD=${DB_PASSWORD:-pwd}
+      - DB_PASSWORD=${DB_PASSWORD:?DB_PASSWORD is required}
+      - API_KEY=${API_KEY:-}
     depends_on:
       database:
         condition: service_healthy

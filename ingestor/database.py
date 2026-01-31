@@ -3,9 +3,11 @@ Database module for Urban Housing Demand data ingestion.
 Handles connections to MySQL database and data operations.
 """
 
+from __future__ import annotations
+
 import os
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pymysql
 import requests
@@ -13,29 +15,42 @@ import requests
 
 class Database:
     """Database connection and operations handler."""
-    
+
     # CMA codes for filtering
     VALID_CMAS = ["Toronto", "Hamilton"]
-    
+
     def __init__(self):
         """Initialize database connection settings from environment variables."""
         self.host = os.getenv("DB_HOST", "localhost")
-        self.port = int(os.getenv("DB_PORT", 3306))
+        self.port = int(os.getenv("DB_PORT", "3306"))
         self.user = os.getenv("DB_USER", "root")
-        self.password = os.getenv("DB_PASSWORD", "pwd")
-        self.database = os.getenv("DB_DATABASE", "template_db")
-        self.connection: Optional[pymysql.Connection] = None
-        
+        # Password required - no insecure defaults
+        self.password = os.getenv("DB_PASSWORD")
+        if not self.password:
+            raise ValueError("DB_PASSWORD environment variable is required")
+        self.database = os.getenv("DB_DATABASE", "urban_housing_demand")
+        self.connection: pymysql.Connection | None = None
+
         # API Config - key should be in environment variable
         self.api_key = os.getenv("API_KEY", "")
         self.api_urls = {
-            "housing_starts_completions": "https://cis-data-service.socs.uoguelph.ca/data/housing_starts_completions",
-            "housing_under_construction": "https://cis-data-service.socs.uoguelph.ca/data/housing_under_construction",
-            "apartment_starts": "https://cis-data-service.socs.uoguelph.ca/data/apartment_starts",
-            "apartment_completions": "https://cis-data-service.socs.uoguelph.ca/data/apartment_completions",
-            "labour_market": "https://cis-data-service.socs.uoguelph.ca/data/labour_market",
+            "housing_starts_completions": (
+                "https://cis-data-service.socs.uoguelph.ca/data/housing_starts_completions"
+            ),
+            "housing_under_construction": (
+                "https://cis-data-service.socs.uoguelph.ca/data/housing_under_construction"
+            ),
+            "apartment_starts": (
+                "https://cis-data-service.socs.uoguelph.ca/data/apartment_starts"
+            ),
+            "apartment_completions": (
+                "https://cis-data-service.socs.uoguelph.ca/data/apartment_completions"
+            ),
+            "labour_market": (
+                "https://cis-data-service.socs.uoguelph.ca/data/labour_market"
+            ),
         }
-        
+
         # Retry configuration
         self.max_retries = 3
         self.retry_delay = 5
@@ -46,7 +61,7 @@ class Database:
         try:
             if value is None or str(value).strip() == "":
                 return 0
-            return int(str(value).replace(',', '').strip())
+            return int(str(value).replace(",", "").strip())
         except ValueError:
             return 0
 
@@ -56,7 +71,7 @@ class Database:
         try:
             if value is None or str(value).strip() == "":
                 return 0.0
-            return float(str(value).replace(',', '').strip())
+            return float(str(value).replace(",", "").strip())
         except ValueError:
             return 0.0
 
@@ -68,7 +83,7 @@ class Database:
                 return self.connection
             except pymysql.MySQLError:
                 self.connection = None
-        
+
         for attempt in range(self.max_retries):
             try:
                 self.connection = pymysql.connect(
@@ -84,7 +99,10 @@ class Database:
                 return self.connection
             except pymysql.MySQLError as e:
                 if attempt < self.max_retries - 1:
-                    print(f"Connection attempt {attempt + 1} failed: {e}. Retrying in {self.retry_delay}s...")
+                    print(
+                        f"Connection attempt {attempt + 1} failed: {e}. "
+                        f"Retrying in {self.retry_delay}s..."
+                    )
                     time.sleep(self.retry_delay)
                 else:
                     raise
@@ -99,16 +117,16 @@ class Database:
             finally:
                 self.connection = None
 
-    def fetch_data(self, key: str) -> List[Dict[str, Any]]:
+    def fetch_data(self, key: str) -> list[dict[str, Any]]:
         """Fetch data from API endpoint with error handling."""
         if not self.api_key:
             print(f"Warning: No API key configured. Skipping API fetch for {key}.")
             return []
-        
+
         if key not in self.api_urls:
             print(f"Unknown data key: {key}")
             return []
-            
+
         try:
             response = requests.get(
                 self.api_urls[key],
@@ -122,22 +140,22 @@ class Database:
             print(f"Error fetching {key} data: {e}")
             return []
 
-    def insert_housing_starts_completions(self, data: List[Dict[str, Any]]) -> int:
+    def insert_housing_starts_completions(self, data: list[dict[str, Any]]) -> int:
         """Insert housing starts & completions data. Returns number of rows inserted."""
         if not data:
             return 0
-            
+
         conn = self.connect()
         cursor = conn.cursor()
         inserted = 0
 
         query = """
-            INSERT INTO housing_starts_completions 
-                (year, month, city, singles_starts, semis_starts, row_starts, 
-                 apt_other_starts, total_starts, singles_complete, semis_complete, 
+            INSERT INTO housing_starts_completions
+                (year, month, city, singles_starts, semis_starts, row_starts,
+                 apt_other_starts, total_starts, singles_complete, semis_complete,
                  row_complete, apt_other_complete, total_complete)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE 
+            ON DUPLICATE KEY UPDATE
                 singles_starts = VALUES(singles_starts),
                 semis_starts = VALUES(semis_starts),
                 row_starts = VALUES(row_starts),
@@ -177,32 +195,33 @@ class Database:
             conn.commit()
         finally:
             cursor.close()
-        
+
         return inserted
 
-    def insert_apartment_starts(self, data: List[Dict[str, Any]]) -> int:
+    def insert_apartment_starts(self, data: list[dict[str, Any]]) -> int:
         """Insert apartment starts data. Returns number of rows inserted."""
         if not data:
             return 0
-            
+
         conn = self.connect()
         cursor = conn.cursor()
         inserted = 0
 
         query = """
             INSERT INTO apartment_starts (
-                year, month, city, struct_15, units_15, struct_619, units_619, 
-                struct_2049, units_2049, struct_5099, units_5099, struct_100199, 
+                year, month, city, struct_15, units_15, struct_619, units_619,
+                struct_2049, units_2049, struct_5099, units_5099, struct_100199,
                 units_100199, struct_200_plus, units_200_plus, total_structure, total_units
-            ) 
+            )
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE 
+            ON DUPLICATE KEY UPDATE
                 struct_15 = VALUES(struct_15), units_15 = VALUES(units_15),
                 struct_619 = VALUES(struct_619), units_619 = VALUES(units_619),
                 struct_2049 = VALUES(struct_2049), units_2049 = VALUES(units_2049),
                 struct_5099 = VALUES(struct_5099), units_5099 = VALUES(units_5099),
                 struct_100199 = VALUES(struct_100199), units_100199 = VALUES(units_100199),
-                struct_200_plus = VALUES(struct_200_plus), units_200_plus = VALUES(units_200_plus),
+                struct_200_plus = VALUES(struct_200_plus),
+                units_200_plus = VALUES(units_200_plus),
                 total_structure = VALUES(total_structure), total_units = VALUES(total_units),
                 last_updated = CURRENT_TIMESTAMP
         """
@@ -237,31 +256,33 @@ class Database:
             conn.commit()
         finally:
             cursor.close()
-        
+
         return inserted
 
-    def insert_apartment_completions(self, data: List[Dict[str, Any]]) -> int:
+    def insert_apartment_completions(self, data: list[dict[str, Any]]) -> int:
         """Insert apartment completions data. Returns number of rows inserted."""
         if not data:
             return 0
-            
+
         conn = self.connect()
         cursor = conn.cursor()
         inserted = 0
 
         query = """
-            INSERT INTO apartment_completions 
-                (year, month, city, struct_15, units_15, struct_619, units_619, 
-                 struct_2049, units_2049, struct_5099, units_5099, struct_100199, 
-                 units_100199, struct_200_plus, units_200_plus, total_structure, total_units)
+            INSERT INTO apartment_completions
+                (year, month, city, struct_15, units_15, struct_619, units_619,
+                 struct_2049, units_2049, struct_5099, units_5099, struct_100199,
+                 units_100199, struct_200_plus, units_200_plus,
+                 total_structure, total_units)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE 
+            ON DUPLICATE KEY UPDATE
                 struct_15 = VALUES(struct_15), units_15 = VALUES(units_15),
                 struct_619 = VALUES(struct_619), units_619 = VALUES(units_619),
                 struct_2049 = VALUES(struct_2049), units_2049 = VALUES(units_2049),
                 struct_5099 = VALUES(struct_5099), units_5099 = VALUES(units_5099),
                 struct_100199 = VALUES(struct_100199), units_100199 = VALUES(units_100199),
-                struct_200_plus = VALUES(struct_200_plus), units_200_plus = VALUES(units_200_plus),
+                struct_200_plus = VALUES(struct_200_plus),
+                units_200_plus = VALUES(units_200_plus),
                 total_structure = VALUES(total_structure), total_units = VALUES(total_units),
                 last_updated = CURRENT_TIMESTAMP
         """
@@ -296,24 +317,24 @@ class Database:
             conn.commit()
         finally:
             cursor.close()
-        
+
         return inserted
 
-    def insert_housing_under_construction(self, data: List[Dict[str, Any]]) -> int:
+    def insert_housing_under_construction(self, data: list[dict[str, Any]]) -> int:
         """Insert housing under construction data. Returns number of rows inserted."""
         if not data:
             return 0
-            
+
         conn = self.connect()
         cursor = conn.cursor()
         inserted = 0
 
         query = """
-            INSERT INTO housing_under_construction 
-                (year, month, city, singles_starts, semis_starts, row_starts, 
+            INSERT INTO housing_under_construction
+                (year, month, city, singles_starts, semis_starts, row_starts,
                  apt_other_starts, total_starts)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE 
+            ON DUPLICATE KEY UPDATE
                 singles_starts = VALUES(singles_starts),
                 semis_starts = VALUES(semis_starts),
                 row_starts = VALUES(row_starts),
@@ -344,26 +365,26 @@ class Database:
             conn.commit()
         finally:
             cursor.close()
-        
+
         return inserted
 
-    def insert_labour_market(self, data: List[Dict[str, Any]]) -> int:
+    def insert_labour_market(self, data: list[dict[str, Any]]) -> int:
         """Insert labour market data. Returns number of rows inserted."""
         if not data:
             return 0
-            
+
         conn = self.connect()
         cursor = conn.cursor()
         inserted = 0
 
         query = """
             INSERT INTO labour_market (
-                rec_num, survyear, survmnth, lfsstat, prov, cma, age_12, age_6, 
-                sex, marstat, educ, mjh, everwork, ftptlast, cowmain, immig, 
-                NAICS_21, NOC_10, NOC_43, HRLYEARN, `UNION`, PERMTEMP, ESTSIZE, 
+                rec_num, survyear, survmnth, lfsstat, prov, cma, age_12, age_6,
+                sex, marstat, educ, mjh, everwork, ftptlast, cowmain, immig,
+                NAICS_21, NOC_10, NOC_43, HRLYEARN, `UNION`, PERMTEMP, ESTSIZE,
                 FIRMSIZE, DURUNEMP, FLOWUNEM, SCHOOLN, EFAMTYPE, FINALWT
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
             )
             ON DUPLICATE KEY UPDATE
@@ -436,7 +457,7 @@ class Database:
             conn.commit()
         finally:
             cursor.close()
-        
+
         return inserted
 
     def get_record_count(self, table: str) -> int:
@@ -444,18 +465,18 @@ class Database:
         # Use parameterized approach to prevent SQL injection
         valid_tables = [
             "housing_starts_completions",
-            "housing_under_construction", 
+            "housing_under_construction",
             "apartment_starts",
             "apartment_completions",
             "labour_market"
         ]
-        
+
         if table not in valid_tables:
             raise ValueError(f"Invalid table name: {table}")
-            
+
         conn = self.connect()
         cursor = conn.cursor()
-        
+
         try:
             cursor.execute(f"SELECT COUNT(*) as count FROM {table}")
             result = cursor.fetchone()
@@ -463,17 +484,17 @@ class Database:
         finally:
             cursor.close()
 
-    def get_all_data(self, table: str) -> List[Dict[str, Any]]:
+    def get_all_data(self, table: str) -> list[dict[str, Any]]:
         """Retrieve all records from a table for Toronto and Hamilton."""
         # Validate table name to prevent SQL injection
         valid_tables = [
             "housing_starts_completions",
             "housing_under_construction",
-            "apartment_starts", 
+            "apartment_starts",
             "apartment_completions",
             "labour_market"
         ]
-        
+
         if table not in valid_tables:
             raise ValueError(f"Invalid table name: {table}")
 

@@ -1,5 +1,5 @@
-import React, {useEffect, useState, useMemo} from "react";
-import {Bar} from "react-chartjs-2";
+import React, {useEffect, useState, useMemo} from 'react';
+import {Bar} from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,9 +8,10 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js";
-import {useTheme} from "../ThemeContext";
-import {getLabourMarketOccupations} from "../services/housingService";
+} from 'chart.js';
+import {getLabourMarketOccupations} from '../services/housingService';
+import {useChartOptions} from '../hooks/useChartOptions';
+import ChartCard from './ChartCard';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -19,23 +20,22 @@ interface OccupationEntry {
   occupation: string;
 }
 
-interface LabourMarketOccupationsProps {
-  city: "Toronto" | "Hamilton";
+interface Props {
+  city: 'Toronto' | 'Hamilton';
 }
 
-// City-specific colors
-const CITY_COLORS = {
-  Toronto: "rgba(255, 99, 132, 0.6)",
-  Hamilton: "rgba(75, 192, 192, 0.6)",
+const COLORS = {
+  Toronto: {bg: 'rgba(244, 63, 94, 0.6)', border: '#f43f5e'},
+  Hamilton: {bg: 'rgba(6, 182, 212, 0.6)', border: '#06b6d4'},
 };
 
-const LabourMarketOccupations: React.FC<LabourMarketOccupationsProps> = ({city}) => {
-  const {theme} = useTheme();
+const LabourMarketOccupations: React.FC<Props> = ({city}) => {
   const [occupationCounts, setOccupationCounts] = useState<Record<string, number>>({});
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const color = CITY_COLORS[city];
+  const colors = COLORS[city];
+  const chartOptions = useChartOptions({title: `${city} Occupations`, rotateXLabels: true});
 
   useEffect(() => {
     let isMounted = true;
@@ -52,21 +52,19 @@ const LabourMarketOccupations: React.FC<LabourMarketOccupationsProps> = ({city})
 
         if (cityData.length === 0) {
           setOccupationCounts({});
-          setError(`No occupation data available for ${city}`);
+          setError(`No occupation data available for ${city}.`);
           return;
         }
 
-        // Count occurrences of each occupation
-        const countedOccupations: Record<string, number> = {};
+        const counts: Record<string, number> = {};
         cityData.forEach((entry) => {
-          countedOccupations[entry.occupation] = (countedOccupations[entry.occupation] || 0) + 1;
+          counts[entry.occupation] = (counts[entry.occupation] || 0) + 1;
         });
 
-        setOccupationCounts(countedOccupations);
-      } catch (err) {
+        setOccupationCounts(counts);
+      } catch {
         if (isMounted) {
-          setError("Failed to load occupation data");
-          console.error(`Error fetching ${city} occupations data:`, err);
+          setError('Failed to load occupation data.');
         }
       } finally {
         if (isMounted) {
@@ -76,10 +74,7 @@ const LabourMarketOccupations: React.FC<LabourMarketOccupationsProps> = ({city})
     }
 
     fetchData();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => {isMounted = false;};
   }, [city]);
 
   const chartData = useMemo(
@@ -87,100 +82,29 @@ const LabourMarketOccupations: React.FC<LabourMarketOccupationsProps> = ({city})
       labels: Object.keys(occupationCounts),
       datasets: [
         {
-          label: `Occupation Distribution (${city})`,
+          label: `Workers (${city})`,
           data: Object.values(occupationCounts),
-          backgroundColor: color,
+          backgroundColor: colors.bg,
+          borderColor: colors.border,
+          borderWidth: 1,
         },
       ],
     }),
-    [occupationCounts, city, color]
+    [occupationCounts, city, colors]
   );
 
-  const chartOptions = useMemo(
-    () => ({
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: theme === "dark" ? "#ffffff" : "#000000",
-          },
-        },
-        title: {
-          display: true,
-          text: `Occupation Breakdown (${city})`,
-          color: theme === "dark" ? "#ffffff" : "#000000",
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: theme === "dark" ? "#ffffff" : "#000000",
-            maxRotation: 90,
-            minRotation: 45,
-          },
-        },
-        y: {
-          ticks: {
-            color: theme === "dark" ? "#ffffff" : "#000000",
-          },
-        },
-      },
-    }),
-    [theme, city]
-  );
-
-  const containerStyle = useMemo(
-    () => ({
-      maxWidth: "900px",
-      margin: "0 auto",
-      padding: "30px",
-      fontFamily: "Arial, sans-serif",
-      color: theme === "dark" ? "#f4f4f4" : "#000000",
-      backgroundColor: theme === "dark" ? "#1c1c1c" : "#ffffff",
-      borderRadius: "12px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-      textAlign: "center" as const,
-    }),
-    [theme]
-  );
-
-  const chartContainerStyle = useMemo(
-    () => ({
-      backgroundColor: theme === "dark" ? "#2c2c2c" : "#f8f8f8",
-      padding: "20px",
-      borderRadius: "8px",
-    }),
-    [theme]
-  );
+  const hasData = Object.keys(occupationCounts).length > 0;
 
   return (
-    <section data-testid={`labour-occupations-${city.toLowerCase()}`} style={containerStyle}>
-      <h1
-        style={{
-          textAlign: "center",
-          fontSize: "2.5rem",
-          marginBottom: "20px",
-          color: theme === "dark" ? "#ffffff" : "#000000",
-        }}
-      >
-        Occupation Breakdown ({city})
-      </h1>
-
-      <div style={chartContainerStyle}>
-        <div style={{width: "100%", height: "600px", paddingBottom: "50px"}}>
-          {loading ? (
-            <p>Loading data...</p>
-          ) : error ? (
-            <p style={{color: "red"}}>{error}</p>
-          ) : Object.keys(occupationCounts).length > 0 ? (
-            <Bar data={chartData} options={chartOptions} />
-          ) : (
-            <p>No occupation data available for {city}.</p>
-          )}
-        </div>
-      </div>
-    </section>
+    <ChartCard
+      title={`Occupation Distribution (${city})`}
+      testId={`labour-occupations-${city.toLowerCase()}`}
+      loading={loading}
+      error={error}
+      hasData={hasData}
+    >
+      {hasData && <Bar data={chartData} options={chartOptions} />}
+    </ChartCard>
   );
 };
 

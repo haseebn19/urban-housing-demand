@@ -1,92 +1,139 @@
+/* CSS Reset & Global Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 /* Root Variables */
 :root {
-  --background-color: #ffffff;
-  --text-color: #000000;
-  --button-bg: #ddd;
-  --button-text: #000;
-  --button-hover-bg: #c0c0c0;
-  --button-hover-text: #000;
-  --button-active-bg: #a8a8a8;
-  --navbar-bg: #f8f9fa;
-  --navbar-shadow: rgba(0, 0, 0, 0.1);
-  --transition-speed: 0.3s ease-in-out;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
 }
 
+/* Light Theme */
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #64748b;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --accent-color: #6366f1;
+}
+
+/* Dark Theme */
 [data-theme="dark"] {
-  --background-color: #121212;
-  --text-color: #ffffff;
-  --button-bg: #3a3a3a;
-  --button-text: #ffffff;
-  --button-hover-bg: #555;
-  --button-hover-text: #fff;
-  --button-active-bg: #777;
-  --navbar-bg: #1e1e1e;
-  --navbar-shadow: rgba(255, 255, 255, 0.1);
+  --bg-primary: #0f0f1a;
+  --bg-secondary: #1e1e2e;
+  --text-primary: #e4e4e7;
+  --text-secondary: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --accent-color: #818cf8;
 }
 
-/* Global Styles */
-body {
-  margin: 0;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  font-family: 'Inter', sans-serif;
-  transition: background-color var(--transition-speed), color var(--transition-speed);
-}
-
-/* Navbar */
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  background-color: var(--navbar-bg);
-  box-shadow: 0 4px 10px var(--navbar-shadow);
-  border-radius: 10px;
-  margin: 10px;
-  transition: background-color var(--transition-speed);
-}
-
-/* Button Styling */
-button {
-  padding: 10px 16px;
+/* Body */
+html {
   font-size: 16px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  border-radius: 8px;
-  transition: background-color var(--transition-speed), transform 0.1s ease-in-out;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Button Hover & Active Effects */
-button:hover {
-  background-color: var(--button-hover-bg);
-  color: var(--button-hover-text);
-  transform: translateY(-2px);
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+  min-height: 100vh;
 }
 
-button:active {
-  background-color: var(--button-active-bg);
-  transform: scale(0.98);
-}
-
-/* Button Spacing */
-.nav-buttons {
+/* App Container */
+.app {
+  min-height: 100vh;
   display: flex;
-  gap: 10px;
+  flex-direction: column;
 }
 
-/* Theme Toggle Button */
-.theme-toggle {
-  background: linear-gradient(135deg, #f093fb, #f5576c);
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 24px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    padding: 32px 24px;
+  }
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+p {
+  color: var(--text-secondary);
+}
+
+/* Links */
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-primary);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--accent-color);
   color: white;
-  border-radius: 8px;
-  transition: background 0.3s ease-in-out, transform 0.1s ease-in-out;
-}
-
-.theme-toggle:hover {
-  background: linear-gradient(135deg, #f5576c, #f093fb);
-  transform: translateY(-2px);
 }

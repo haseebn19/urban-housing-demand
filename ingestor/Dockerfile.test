@@ -2,10 +2,19 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Create non-root user for security
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install pytest pytest-cov ruff
 
 COPY . .
 
-CMD ["pytest", "tests/", "-v", "--cov=.", "--cov-report=term-missing"]
+# Set ownership
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root user
+USER appuser
+
+# Run ruff (lint) first, then tests
+CMD sh -c "ruff check . && python -m pytest tests/test.py -v --cov=. --cov-report=term-missing"

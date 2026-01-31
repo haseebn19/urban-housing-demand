@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from "react";
-import {Line} from "react-chartjs-2";
+import React, {useEffect, useState} from 'react';
+import {Line} from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,14 +9,13 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js";
-import {useTheme} from "../ThemeContext";
-import {getHousingCompletionRatios} from "../services/housingService"; // Import your API function
+} from 'chart.js';
+import {getHousingCompletionRatios} from '../services/housingService';
+import {useChartOptions} from '../hooks/useChartOptions';
+import ChartCard from './ChartCard';
 
-// Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-// Types
 interface ChartData {
   labels: string[];
   datasets: {
@@ -24,150 +23,97 @@ interface ChartData {
     data: number[];
     borderColor: string;
     backgroundColor: string;
+    tension: number;
   }[];
 }
 
-// Helper to transform raw data into chart-friendly format
-// Notice we now take the same shape returned by getHousingCompletionRatios
-function processChartData(
-  data: {city: string; year: number; month: number; ratio: number}[]
-): ChartData {
-  // Create an array of unique YYYY-MM labels
+interface RawData {
+  city: string;
+  year: number;
+  month: number;
+  ratio: number;
+}
+
+function processChartData(data: RawData[]): ChartData {
   const timeLabels = [
     ...new Set(
-      data.map(
-        (entry) => `${entry.year}-${String(entry.month).padStart(2, "0")}`
-      )
+      data.map((entry) => `${entry.year}-${String(entry.month).padStart(2, '0')}`)
     ),
-  ];
+  ].sort();
 
-  // For a given city, produce an array of ratio*100 values in label order
-  const getCityCompletionRates = (city: string) =>
+  const getCityRates = (city: string) =>
     timeLabels.map((date) => {
       const entry = data.find(
         (item) =>
           item.city === city &&
-          `${item.year}-${String(item.month).padStart(2, "0")}` === date
+          `${item.year}-${String(item.month).padStart(2, '0')}` === date
       );
-      // Multiply ratio by 100 to get a percentage
-      return entry ? entry.ratio * 100 : 0;
+      return entry ? Math.round(entry.ratio * 100) : 0;
     });
 
   return {
     labels: timeLabels,
     datasets: [
       {
-        label: "Hamilton Completion Rate (%)",
-        data: getCityCompletionRates("Hamilton"),
-        borderColor: "rgba(75,192,192,1)",
-        backgroundColor: "rgba(75,192,192,0.2)",
+        label: 'Hamilton (%)',
+        data: getCityRates('Hamilton'),
+        borderColor: '#06b6d4',
+        backgroundColor: 'rgba(6, 182, 212, 0.2)',
+        tension: 0.3,
       },
       {
-        label: "Toronto Completion Rate (%)",
-        data: getCityCompletionRates("Toronto"),
-        borderColor: "rgba(255,99,132,1)",
-        backgroundColor: "rgba(255,99,132,0.2)",
+        label: 'Toronto (%)',
+        data: getCityRates('Toronto'),
+        borderColor: '#f43f5e',
+        backgroundColor: 'rgba(244, 63, 94, 0.2)',
+        tension: 0.3,
       },
     ],
   };
 }
 
 const HousingCompletionRatio: React.FC = () => {
-  const {theme} = useTheme(); // Using your dark/light theme
-  const [chartData, setChartData] = useState<ChartData>({labels: [], datasets: []});
+  const [chartData, setChartData] = useState<ChartData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const chartOptions = useChartOptions({title: 'Completion Rate Over Time'});
 
   useEffect(() => {
-    // Fetch real data instead of mock
+    let isMounted = true;
+
     async function fetchData() {
       try {
+        setError(null);
         const apiData = await getHousingCompletionRatios();
-        const processed = processChartData(apiData);
-        setChartData(processed);
-      } catch (err) {
-        console.error("Error loading housing completion ratios:", err);
+        if (isMounted && apiData.length > 0) {
+          setChartData(processChartData(apiData));
+        }
+      } catch {
+        if (isMounted) {
+          setError('Failed to load housing completion data.');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     fetchData();
+    return () => {isMounted = false;};
   }, []);
 
   return (
-    <section
-      data-testid="housing-completion-ratio"
-      style={{
-        maxWidth: "900px",
-        margin: "0 auto",
-        padding: "30px",
-        fontFamily: "Arial, sans-serif",
-        color: theme === "dark" ? "#f4f4f4" : "#000000",
-        backgroundColor: theme === "dark" ? "#1c1c1c" : "#ffffff",
-        borderRadius: "12px",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-        textAlign: "center",
-      }}
+    <ChartCard
+      title="Housing Completion Rate (Hamilton vs Toronto)"
+      testId="housing-completion-ratio"
+      loading={loading}
+      error={error}
+      hasData={chartData !== null && chartData.labels.length > 0}
     >
-      <h1
-        style={{
-          textAlign: "center",
-          fontSize: "2.5rem",
-          marginBottom: "20px",
-          color: theme === "dark" ? "#ffffff" : "#000000",
-        }}
-      >
-        Housing Completion Rate (Hamilton vs Toronto)
-      </h1>
-
-      <div
-        style={{
-          backgroundColor: theme === "dark" ? "#2c2c2c" : "#f8f8f8",
-          padding: "20px",
-          borderRadius: "8px",
-        }}
-      >
-        {loading ? (
-          <p>Loading chart data...</p>
-        ) : chartData.labels.length > 0 ? (
-          <div style={{width: "100%", height: "500px"}}>
-            <Line
-              data={chartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    labels: {
-                      color: theme === "dark" ? "#ffffff" : "#000000",
-                    },
-                  },
-                  title: {
-                    display: true,
-                    text: "Housing Completion Rates",
-                    color: theme === "dark" ? "#ffffff" : "#000000",
-                  },
-                },
-                scales: {
-                  x: {
-                    ticks: {
-                      color: theme === "dark" ? "#ffffff" : "#000000",
-                    },
-                  },
-                  y: {
-                    ticks: {
-                      color: theme === "dark" ? "#ffffff" : "#000000",
-                    },
-                  },
-                },
-              }}
-            />
-          </div>
-        ) : (
-          <p>No data available.</p>
-        )}
-      </div>
-    </section>
+      {chartData && <Line data={chartData} options={chartOptions} />}
+    </ChartCard>
   );
 };
 

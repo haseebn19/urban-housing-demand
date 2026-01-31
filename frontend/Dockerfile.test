@@ -1,10 +1,24 @@
 FROM node:18-alpine
 
+# Install build dependencies for native modules (canvas)
+RUN apk add --no-cache python3 make g++ cairo-dev pango-dev jpeg-dev giflib-dev
+
 WORKDIR /app
 
+# Create non-root user for security
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
+
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
 
-CMD ["npm", "test", "--", "--watchAll=false", "--coverage"]
+# Set ownership
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root user
+USER appuser
+
+# Run lint first, then tests
+CMD sh -c "npm run lint && npm test -- --watchAll=false --coverage"

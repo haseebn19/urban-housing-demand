@@ -4,7 +4,7 @@
   "private": true,
   "description": "Full-stack housing demand visualization for Toronto and Hamilton",
   "scripts": {
-    "test": "docker compose -f compose.test.yaml up --build --abort-on-container-exit",
+    "test": "docker compose -f compose.test.yaml up --build",
     "start": "docker compose up -d",
     "stop": "docker compose down",
     "build": "docker compose build"

@@ -33,36 +33,40 @@ interface ImmigrationData {
 }
 
 /**
- * Generic fetch wrapper with error handling
+ * Generic fetch wrapper with error handling and type normalization
  */
-async function fetchApi<T>(endpoint: string): Promise<T[]> {
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error(`Error fetching ${endpoint}:`, error);
-    }
-    return [];
+async function fetchApi<T>(endpoint: string, normalizer?: (data: T[]) => T[]): Promise<T[]> {
+  const response = await fetch(`${API_URL}${endpoint}`);
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
   }
+  const data = await response.json();
+  return normalizer ? normalizer(data) : data;
+}
+
+/**
+ * Normalizes year/month fields from string to number
+ */
+function normalizeTimeFields<T extends {year?: unknown; month?: unknown}>(data: T[]): T[] {
+  return data.map(item => ({
+    ...item,
+    year: typeof item.year === 'string' ? parseInt(item.year, 10) : item.year,
+    month: typeof item.month === 'string' ? parseInt(item.month, 10) : item.month,
+  }));
 }
 
 /**
  * Fetch housing completion ratios from the backend.
  */
 export const getHousingCompletionRatios = async (): Promise<HousingRatio[]> => {
-  return fetchApi<HousingRatio>('/starts-completions/ratio');
+  return fetchApi<HousingRatio>('/starts-completions/ratio', normalizeTimeFields);
 };
 
 /**
  * Fetch housing total starts and completions from the backend.
  */
 export const getHousingTotalStartsCompletions = async (): Promise<HousingTotal[]> => {
-  return fetchApi<HousingTotal>('/starts-completions/total');
+  return fetchApi<HousingTotal>('/starts-completions/total', normalizeTimeFields);
 };
 
 /**
@@ -83,5 +87,5 @@ export const getLabourMarketFamilyTypes = async (): Promise<FamilyTypeData[]> =>
  * Fetch labour market immigration data from the backend.
  */
 export const getLabourMarketImmigration = async (): Promise<ImmigrationData[]> => {
-  return fetchApi<ImmigrationData>('/labour-market/immigration-data');
+  return fetchApi<ImmigrationData>('/labour-market/immigration-data', normalizeTimeFields);
 };

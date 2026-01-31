@@ -9,7 +9,6 @@ COPY gradle/wrapper/gradle-wrapper.properties ./gradle/wrapper/gradle-wrapper.pr
 COPY gradle/wrapper/gradle-wrapper.jar ./gradle/wrapper/gradle-wrapper.jar
 COPY config/checkstyle/checkstyle.xml ./config/checkstyle/checkstyle.xml
 COPY build.gradle .
-COPY build.linter.gradle .
 
 # Make gradlew executable
 RUN chmod +x ./gradlew
@@ -28,6 +27,10 @@ FROM eclipse-temurin:17-jre-jammy AS runtime
 
 WORKDIR /app
 
+# Install wget for healthcheck (lighter than curl)
+RUN apt-get update && apt-get install -y --no-install-recommends wget \
+    && rm -rf /var/lib/apt/lists/*
+
 # Create non-root user for security
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
@@ -43,9 +46,9 @@ USER appuser
 # Expose port
 EXPOSE 8080
 
-# Health check
+# Health check using wget
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8080/actuator/health || exit 1
+    CMD wget --quiet --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the application with optimized JVM settings
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]

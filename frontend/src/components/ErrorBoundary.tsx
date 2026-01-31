@@ -40,7 +40,7 @@ class ErrorBoundary extends Component<Props, State> {
         >
           <h1 style={{color: '#d32f2f'}}>Something went wrong</h1>
           <p style={{color: '#666', marginBottom: '20px'}}>
-            We're sorry, but something unexpected happened. Please try refreshing the page.
+            We&apos;re sorry, but something unexpected happened. Please try refreshing the page.
           </p>
           <details style={{textAlign: 'left', maxWidth: '600px', margin: '0 auto'}}>
             <summary style={{cursor: 'pointer', color: '#1976d2'}}>

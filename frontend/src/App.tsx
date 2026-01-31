@@ -9,47 +9,49 @@ import Immigration from './components/Immigration';
 import ErrorBoundary from './components/ErrorBoundary';
 import {ThemeProvider} from './ThemeContext';
 
-type PageType = "pitch" | "starts" | "occupations" | "family" | "immigration";
+type PageType = 'pitch' | 'starts' | 'occupations' | 'family' | 'immigration';
 
 const App: React.FC = () => {
-  const [page, setPage] = useState<PageType>("pitch");
+  const [page, setPage] = useState<PageType>('pitch');
 
   return (
     <ThemeProvider>
       <ErrorBoundary>
-        <div className="App">
-          <Navbar setPage={setPage} />
+        <div className="app">
+          <Navbar currentPage={page} setPage={setPage} />
 
-          {page === "pitch" && <ProductPitch />}
+          <main className="main-content">
+            {page === 'pitch' && <ProductPitch />}
 
-          {page === "starts" && (
-            <>
-              <HousingCompletionRatio />
-              <HousingStartsCompletions city="Hamilton" />
-              <HousingStartsCompletions city="Toronto" />
-            </>
-          )}
+            {page === 'starts' && (
+              <>
+                <HousingCompletionRatio />
+                <HousingStartsCompletions city="Hamilton" />
+                <HousingStartsCompletions city="Toronto" />
+              </>
+            )}
 
-          {page === "occupations" && (
-            <>
-              <LabourMarketOccupations city="Hamilton" />
-              <LabourMarketOccupations city="Toronto" />
-            </>
-          )}
+            {page === 'occupations' && (
+              <>
+                <LabourMarketOccupations city="Hamilton" />
+                <LabourMarketOccupations city="Toronto" />
+              </>
+            )}
 
-          {page === "family" && (
-            <>
-              <LabourMarketFamilyTypes city="Hamilton" />
-              <LabourMarketFamilyTypes city="Toronto" />
-            </>
-          )}
+            {page === 'family' && (
+              <>
+                <LabourMarketFamilyTypes city="Hamilton" />
+                <LabourMarketFamilyTypes city="Toronto" />
+              </>
+            )}
 
-          {page === "immigration" && (
-            <>
-              <Immigration city="Hamilton" />
-              <Immigration city="Toronto" />
-            </>
-          )}
+            {page === 'immigration' && (
+              <>
+                <Immigration city="Hamilton" />
+                <Immigration city="Toronto" />
+              </>
+            )}
+          </main>
         </div>
       </ErrorBoundary>
     </ThemeProvider>

@@ -1,5 +1,5 @@
 # Docker Compose for running all tests
-# Usage: docker compose -f compose.test.yaml up --build --abort-on-container-exit
+# Usage: docker compose -f compose.test.yaml up --build
 
 services:
   test-frontend:
@@ -13,8 +13,12 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.test
+    environment:
+      - DDL_AUTO=create-drop
 
   test-ingestor:
     build:
       context: ./ingestor
       dockerfile: Dockerfile.test
+    environment:
+      - DB_PASSWORD=test_password

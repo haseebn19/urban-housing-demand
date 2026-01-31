@@ -1,32 +1,46 @@
-import React, {useContext} from "react";
-import {ThemeContext} from "../ThemeContext";
+import React from 'react';
+import {useTheme} from '../ThemeContext';
+import './Navbar.css';
+
+type PageType = 'pitch' | 'starts' | 'occupations' | 'family' | 'immigration';
 
 interface NavbarProps {
-  setPage: (page: 'pitch' | 'starts' | 'occupations' | "family" | 'immigration') => void;
+  currentPage: PageType;
+  setPage: (page: PageType) => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({setPage}) => {
-  const themeContext = useContext(ThemeContext);
+const NAV_ITEMS: {key: PageType; label: string}[] = [
+  {key: 'pitch', label: 'Overview'},
+  {key: 'starts', label: 'Housing'},
+  {key: 'occupations', label: 'Occupations'},
+  {key: 'family', label: 'Family Types'},
+  {key: 'immigration', label: 'Immigration'},
+];
 
-  if (!themeContext) {
-    console.error("ThemeContext is not available");
-    return null; // Prevent crashes if ThemeContext isn't available
-  }
-
-  const {theme, toggleTheme} = themeContext;
+const Navbar: React.FC<NavbarProps> = ({currentPage, setPage}) => {
+  const {theme, toggleTheme} = useTheme();
 
   return (
-
-    <nav style={{display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px", backgroundColor: "var(--background-color)"}}>
-      <div>
-        <button onClick={() => setPage("pitch")}>Product Pitch</button>
-        <button onClick={() => setPage("starts")}>Starts & Completions</button>
-        <button onClick={() => setPage("occupations")}>Occupations</button>
-        <button onClick={() => setPage("family")}>Family Types</button>
-        <button onClick={() => setPage("immigration")}>Immigration</button>
+    <nav className={`navbar ${theme}`}>
+      <div className="navbar__brand">
+        <span className="navbar__logo">UHD</span>
+        <span className="navbar__title">Urban Housing Demand</span>
       </div>
-      <button onClick={toggleTheme} style={{padding: "8px 16px", borderRadius: "5px"}}>
-        {theme === "light" ? "Dark Mode" : "Light Mode"}
+
+      <div className="navbar__links">
+        {NAV_ITEMS.map(({key, label}) => (
+          <button
+            key={key}
+            className={`navbar__link ${currentPage === key ? 'navbar__link--active' : ''}`}
+            onClick={() => setPage(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <button className="navbar__theme-toggle" onClick={toggleTheme}>
+        {theme === 'light' ? '🌙' : '☀️'}
       </button>
     </nav>
   );

@@ -1,6 +1,6 @@
 -- Create database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS template_db;
-USE template_db;
+CREATE DATABASE IF NOT EXISTS urban_housing_demand;
+USE urban_housing_demand;
 
 -- Table for Housing Starts and Completions
 CREATE TABLE IF NOT EXISTS housing_starts_completions (
@@ -26,7 +26,10 @@ CREATE TABLE IF NOT EXISTS housing_starts_completions (
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     -- Unique constraint to prevent duplicates
-    UNIQUE KEY unique_housing_entry (year, month, city)
+    UNIQUE KEY unique_housing_entry (year, month, city),
+    -- Index for faster queries
+    INDEX idx_city (city),
+    INDEX idx_year_month (year, month)
 );
 
 -- Table for Housing Under Construction

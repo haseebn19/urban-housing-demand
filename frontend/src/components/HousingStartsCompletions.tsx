@@ -1,5 +1,5 @@
-import React, {useEffect, useState, useMemo} from "react";
-import {Bar} from "react-chartjs-2";
+import React, {useEffect, useState} from 'react';
+import {Bar} from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,9 +8,10 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js";
-import {useTheme} from "../ThemeContext";
-import {getHousingTotalStartsCompletions} from "../services/housingService";
+} from 'chart.js';
+import {getHousingTotalStartsCompletions} from '../services/housingService';
+import {useChartOptions} from '../hooks/useChartOptions';
+import ChartCard from './ChartCard';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -20,6 +21,8 @@ interface ChartData {
     label: string;
     data: number[];
     backgroundColor: string;
+    borderColor: string;
+    borderWidth: number;
   }[];
 }
 
@@ -31,29 +34,28 @@ interface HousingEntry {
   totalCompletions: number;
 }
 
-interface HousingStartsCompletionsProps {
-  city: "Toronto" | "Hamilton";
+interface Props {
+  city: 'Toronto' | 'Hamilton';
 }
 
-// City-specific colors
-const CITY_COLORS = {
+const COLORS = {
   Toronto: {
-    starts: "rgba(0, 200, 0, 0.6)",
-    completions: "rgba(0, 200, 0, 1)",
+    starts: {bg: 'rgba(34, 197, 94, 0.6)', border: '#22c55e'},
+    completions: {bg: 'rgba(34, 197, 94, 0.9)', border: '#16a34a'},
   },
   Hamilton: {
-    starts: "rgba(0, 123, 255, 0.6)",
-    completions: "rgba(0, 123, 255, 1)",
+    starts: {bg: 'rgba(59, 130, 246, 0.6)', border: '#3b82f6'},
+    completions: {bg: 'rgba(59, 130, 246, 0.9)', border: '#2563eb'},
   },
 };
 
-const HousingStartsCompletions: React.FC<HousingStartsCompletionsProps> = ({city}) => {
-  const {theme} = useTheme();
+const HousingStartsCompletions: React.FC<Props> = ({city}) => {
   const [chartData, setChartData] = useState<ChartData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const colors = CITY_COLORS[city];
+  const colors = COLORS[city];
+  const chartOptions = useChartOptions({title: `${city} Housing Activity`});
 
   useEffect(() => {
     let isMounted = true;
@@ -66,67 +68,54 @@ const HousingStartsCompletions: React.FC<HousingStartsCompletionsProps> = ({city
 
         if (!isMounted) return;
 
-        // Filter for specified city
         const cityData = allData.filter((entry) => entry.city === city);
 
         if (cityData.length === 0) {
           setChartData(null);
-          setError(`No data available for ${city}`);
+          setError(`No data available for ${city}.`);
           return;
         }
 
-        // Group by (year, month) to avoid duplicates
-        const groupedMap = new Map<
-          string,
-          {year: number; month: number; totalStarts: number; totalCompletions: number}
-        >();
+        // Group by year-month
+        const grouped = new Map<string, {year: number; month: number; starts: number; completions: number}>();
 
         for (const row of cityData) {
-          const ymKey = `${row.year}-${row.month}`;
-          if (!groupedMap.has(ymKey)) {
-            groupedMap.set(ymKey, {
-              year: row.year,
-              month: row.month,
-              totalStarts: 0,
-              totalCompletions: 0,
-            });
+          const key = `${row.year}-${row.month}`;
+          if (!grouped.has(key)) {
+            grouped.set(key, {year: row.year, month: row.month, starts: 0, completions: 0});
           }
-          const existing = groupedMap.get(ymKey)!;
-          existing.totalStarts += row.totalStarts;
-          existing.totalCompletions += row.totalCompletions;
+          const entry = grouped.get(key);
+          if (!entry) continue;
+          entry.starts += row.totalStarts;
+          entry.completions += row.totalCompletions;
         }
 
-        // Convert map to sorted array
-        const groupedArray = Array.from(groupedMap.values()).sort((a, b) => {
-          const dateA = a.year * 100 + a.month;
-          const dateB = b.year * 100 + b.month;
-          return dateA - dateB;
-        });
+        const sorted = Array.from(grouped.values()).sort(
+          (a, b) => a.year * 100 + a.month - (b.year * 100 + b.month)
+        );
 
-        // Build chart data
-        const newChartData: ChartData = {
-          labels: groupedArray.map(
-            (item) => `${item.year}-${String(item.month).padStart(2, "0")}`
-          ),
+        setChartData({
+          labels: sorted.map((item) => `${item.year}-${String(item.month).padStart(2, '0')}`),
           datasets: [
             {
-              label: `Total Starts (${city})`,
-              data: groupedArray.map((item) => item.totalStarts),
-              backgroundColor: colors.starts,
+              label: 'Starts',
+              data: sorted.map((item) => item.starts),
+              backgroundColor: colors.starts.bg,
+              borderColor: colors.starts.border,
+              borderWidth: 1,
             },
             {
-              label: `Total Completions (${city})`,
-              data: groupedArray.map((item) => item.totalCompletions),
-              backgroundColor: colors.completions,
+              label: 'Completions',
+              data: sorted.map((item) => item.completions),
+              backgroundColor: colors.completions.bg,
+              borderColor: colors.completions.border,
+              borderWidth: 1,
             },
           ],
-        };
-
-        setChartData(newChartData);
-      } catch (err) {
+        });
+      } catch {
         if (isMounted) {
-          setError("Failed to load housing data");
-          console.error(`Error fetching ${city} housing data:`, err);
+          setError('Failed to load housing data.');
         }
       } finally {
         if (isMounted) {
@@ -136,94 +125,19 @@ const HousingStartsCompletions: React.FC<HousingStartsCompletionsProps> = ({city
     }
 
     fetchData();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => {isMounted = false;};
   }, [city, colors]);
 
-  const chartOptions = useMemo(
-    () => ({
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: theme === "dark" ? "#ffffff" : "#000000",
-          },
-        },
-        title: {
-          display: true,
-          text: `Housing Starts and Completions (${city})`,
-          color: theme === "dark" ? "#ffffff" : "#000000",
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: theme === "dark" ? "#ffffff" : "#000000",
-          },
-        },
-        y: {
-          ticks: {
-            color: theme === "dark" ? "#ffffff" : "#000000",
-          },
-        },
-      },
-    }),
-    [theme, city]
-  );
-
-  const containerStyle = useMemo(
-    () => ({
-      maxWidth: "900px",
-      margin: "0 auto",
-      padding: "30px",
-      fontFamily: "Arial, sans-serif",
-      color: theme === "dark" ? "#f4f4f4" : "#000000",
-      backgroundColor: theme === "dark" ? "#1c1c1c" : "#ffffff",
-      borderRadius: "12px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-      textAlign: "center" as const,
-    }),
-    [theme]
-  );
-
-  const chartContainerStyle = useMemo(
-    () => ({
-      backgroundColor: theme === "dark" ? "#2c2c2c" : "#f8f8f8",
-      padding: "20px",
-      borderRadius: "8px",
-      height: "600px",
-    }),
-    [theme]
-  );
-
   return (
-    <section data-testid={`housing-starts-${city.toLowerCase()}`} style={containerStyle}>
-      <h1
-        style={{
-          textAlign: "center",
-          fontSize: "2.5rem",
-          marginBottom: "20px",
-          color: theme === "dark" ? "#ffffff" : "#000000",
-        }}
-      >
-        Housing Starts and Completions ({city})
-      </h1>
-
-      <div style={chartContainerStyle}>
-        {loading ? (
-          <p>Loading chart data...</p>
-        ) : error ? (
-          <p style={{color: "red"}}>{error}</p>
-        ) : chartData ? (
-          <Bar data={chartData} options={chartOptions} />
-        ) : (
-          <p>No data available for {city}.</p>
-        )}
-      </div>
-    </section>
+    <ChartCard
+      title={`Housing Starts & Completions (${city})`}
+      testId={`housing-starts-${city.toLowerCase()}`}
+      loading={loading}
+      error={error}
+      hasData={chartData !== null}
+    >
+      {chartData && <Bar data={chartData} options={chartOptions} />}
+    </ChartCard>
   );
 };
 
