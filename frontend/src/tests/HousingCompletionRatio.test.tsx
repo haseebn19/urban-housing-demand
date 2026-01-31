@@ -1,55 +1,52 @@
-import React from "react";
-import {render, screen, waitFor} from "@testing-library/react";
-import "@testing-library/jest-dom";
-import {ThemeContext} from "../ThemeContext";
-import HousingCompletionRatio from "../components/HousingCompletionRatio";
+import {describe, it, expect, vi, beforeAll} from 'vitest';
+import {render, screen, waitFor} from '@testing-library/react';
+import {ThemeContext} from '../ThemeContext';
+import HousingCompletionRatio from '../components/HousingCompletionRatio';
 
 // Mock API response
-jest.mock("../services/housingService", () => ({
-  getHousingCompletionRatios: jest.fn().mockResolvedValue([
-    {city: "Hamilton", year: 2023, month: 1, ratio: 0.85},
-    {city: "Hamilton", year: 2023, month: 2, ratio: 0.88},
-    {city: "Toronto", year: 2023, month: 1, ratio: 0.82},
-    {city: "Toronto", year: 2023, month: 2, ratio: 0.80},
+vi.mock('../services/housingService', () => ({
+  getHousingCompletionRatios: vi.fn().mockResolvedValue([
+    {city: 'Hamilton', year: 2023, month: 1, ratio: 0.85},
+    {city: 'Hamilton', year: 2023, month: 2, ratio: 0.88},
+    {city: 'Toronto', year: 2023, month: 1, ratio: 0.82},
+    {city: 'Toronto', year: 2023, month: 2, ratio: 0.80},
   ]),
 }));
 
 beforeAll(() => {
   class ResizeObserver {
-    observe(): void { /* noop */}
-    unobserve(): void { /* noop */}
-    disconnect(): void { /* noop */}
+    observe(): void { /* noop */ }
+    unobserve(): void { /* noop */ }
+    disconnect(): void { /* noop */ }
   }
-  // @ts-expect-error - ResizeObserver mock for tests
-  global.ResizeObserver = ResizeObserver;
+  vi.stubGlobal('ResizeObserver', ResizeObserver);
 });
 
-describe("HousingCompletionRatio Component", () => {
-  it("renders the chart container and updates theme context without crashing", async () => {
-    const {rerender} = render(
-      <ThemeContext.Provider value={{theme: "light", toggleTheme: jest.fn()}}>
+describe('HousingCompletionRatio Component', () => {
+  it('renders the chart container without crashing', async () => {
+    render(
+      <ThemeContext.Provider value={{theme: 'light', toggleTheme: vi.fn()}}>
         <HousingCompletionRatio />
       </ThemeContext.Provider>
     );
 
     // Ensure the component is in the DOM
-    const container = await screen.findByTestId("housing-completion-ratio");
+    const container = await screen.findByTestId('housing-completion-ratio');
     expect(container).toBeInTheDocument();
+    expect(container).toHaveClass('chart-card');
 
     // Wait for the loading text to disappear
     await waitFor(() => expect(screen.queryByText(/Loading data/i)).not.toBeInTheDocument());
+  });
 
-    // Re-render with dark theme
-    rerender(
-      <ThemeContext.Provider value={{theme: "dark", toggleTheme: jest.fn()}}>
+  it('renders with dark theme', async () => {
+    render(
+      <ThemeContext.Provider value={{theme: 'dark', toggleTheme: vi.fn()}}>
         <HousingCompletionRatio />
       </ThemeContext.Provider>
     );
 
-    // Ensure it still renders
-    expect(await screen.findByTestId("housing-completion-ratio")).toBeInTheDocument();
-
-    // Verify component still renders with dark theme
-    expect(container).toHaveClass("chart-card");
+    const container = await screen.findByTestId('housing-completion-ratio');
+    expect(container).toBeInTheDocument();
   });
 });

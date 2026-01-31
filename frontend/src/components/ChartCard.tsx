@@ -8,6 +8,7 @@ interface ChartCardProps {
   loading: boolean;
   error: string | null;
   hasData: boolean;
+  tall?: boolean;
   children: React.ReactNode;
 }
 
@@ -21,6 +22,7 @@ const ChartCard: React.FC<ChartCardProps> = ({
   loading,
   error,
   hasData,
+  tall = false,
   children,
 }) => {
   const {theme} = useTheme();
@@ -42,7 +44,7 @@ const ChartCard: React.FC<ChartCardProps> = ({
             <p>{error}</p>
           </div>
         ) : hasData ? (
-          <div className="chart-card__chart">{children}</div>
+          <div className={`chart-card__chart ${tall ? 'chart-card__chart--tall' : ''}`}>{children}</div>
         ) : (
           <div className="chart-card__status">
             <p>No data available.</p>

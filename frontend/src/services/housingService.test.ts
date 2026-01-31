@@ -1,80 +1,103 @@
+import {describe, it, expect, beforeEach, vi} from 'vitest';
 import {
-  getLabourMarketFamilyTypes, getHousingCompletionRatios, getHousingTotalStartsCompletions, getLabourMarketOccupations
+  getLabourMarketFamilyTypes,
+  getHousingCompletionRatios,
+  getHousingTotalStartsCompletions,
+  getLabourMarketOccupations,
 } from './housingService';
-import fetchMock from 'jest-fetch-mock';
 
-fetchMock.enableMocks();
+// Mock fetch globally
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
 
 beforeEach(() => {
-  fetchMock.resetMocks();
+  mockFetch.mockReset();
 });
 
-it("successfully fetches housing completion ratio data", async () => {
-  const mockData = [{id: 1, name: 'Test Data'}];
-  fetchMock.mockResponseOnce(JSON.stringify(mockData));
+describe('housingService', () => {
+  describe('getHousingCompletionRatios', () => {
+    it('successfully fetches housing completion ratio data', async () => {
+      const mockData = [{id: 1, name: 'Test Data'}];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockData),
+      });
 
-  const data = await getHousingCompletionRatios();
-  expect(data).toEqual(mockData);
-  expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual('/api/housing/starts-completions/ratio');
-});
+      const data = await getHousingCompletionRatios();
+      expect(data).toEqual(mockData);
+      expect(mockFetch).toHaveBeenCalledWith('/api/housing/starts-completions/ratio');
+    });
 
-it('handles fetch failure for completion ratios', async () => {
-  fetchMock.mockResponseOnce('', {status: 500});
+    it('handles fetch failure for completion ratios', async () => {
+      mockFetch.mockResolvedValueOnce({ok: false, status: 500});
 
-  await expect(getHousingCompletionRatios()).rejects.toThrow('HTTP error');
-});
+      await expect(getHousingCompletionRatios()).rejects.toThrow('HTTP error');
+    });
+  });
 
-it("Successfully fetches total housing starts and completions data", async () => {
-  const mockData = [{id: 1, name: 'Test Data'}];
-  fetchMock.mockResponseOnce(JSON.stringify(mockData));
+  describe('getHousingTotalStartsCompletions', () => {
+    it('successfully fetches total housing starts and completions data', async () => {
+      const mockData = [{id: 1, name: 'Test Data'}];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockData),
+      });
 
-  const data = await getHousingTotalStartsCompletions();
-  expect(data).toEqual(mockData);
-  expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual('/api/housing/starts-completions/total');
-});
+      const data = await getHousingTotalStartsCompletions();
+      expect(data).toEqual(mockData);
+      expect(mockFetch).toHaveBeenCalledWith('/api/housing/starts-completions/total');
+    });
 
-it('handles fetch failure for total starts/completions', async () => {
-  fetchMock.mockResponseOnce('', {status: 500});
+    it('handles fetch failure for total starts/completions', async () => {
+      mockFetch.mockResolvedValueOnce({ok: false, status: 500});
 
-  await expect(getHousingTotalStartsCompletions()).rejects.toThrow('HTTP error');
-});
+      await expect(getHousingTotalStartsCompletions()).rejects.toThrow('HTTP error');
+    });
+  });
 
-it("successfully fetches labour market occupation data", async () => {
-  const mockData = [
-    {city: "Hamilton", occupation: "Engineer", count: 150},
-    {city: "Toronto", occupation: "Teacher", count: 120},
-  ];
-  fetchMock.mockResponseOnce(JSON.stringify(mockData));
+  describe('getLabourMarketOccupations', () => {
+    it('successfully fetches labour market occupation data', async () => {
+      const mockData = [
+        {city: 'Hamilton', occupation: 'Engineer', count: 150},
+        {city: 'Toronto', occupation: 'Teacher', count: 120},
+      ];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockData),
+      });
 
-  const data = await getLabourMarketOccupations();
-  expect(data).toEqual(mockData);
-  expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual('/api/housing/labour-market/occupation');
-});
+      const data = await getLabourMarketOccupations();
+      expect(data).toEqual(mockData);
+      expect(mockFetch).toHaveBeenCalledWith('/api/housing/labour-market/occupation');
+    });
 
-it("handles fetch failure for labour market occupation data", async () => {
-  fetchMock.mockResponseOnce('', {status: 500});
+    it('handles fetch failure for labour market occupation data', async () => {
+      mockFetch.mockResolvedValueOnce({ok: false, status: 500});
 
-  await expect(getLabourMarketOccupations()).rejects.toThrow('HTTP error');
-});
+      await expect(getLabourMarketOccupations()).rejects.toThrow('HTTP error');
+    });
+  });
 
-it("successfully fetches labour market family types data", async () => {
-  const mockData = [
-    {city: "Hamilton", familyType: "Single Parent", count: 200},
-    {city: "Toronto", familyType: "Couple with Children", count: 350},
-  ];
-  fetchMock.mockResponseOnce(JSON.stringify(mockData));
+  describe('getLabourMarketFamilyTypes', () => {
+    it('successfully fetches labour market family types data', async () => {
+      const mockData = [
+        {city: 'Hamilton', familyType: 'Single Parent', count: 200},
+        {city: 'Toronto', familyType: 'Couple with Children', count: 350},
+      ];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockData),
+      });
 
-  const data = await getLabourMarketFamilyTypes();
-  expect(data).toEqual(mockData);
-  expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toContain('/labour-market/family-type');
-});
+      const data = await getLabourMarketFamilyTypes();
+      expect(data).toEqual(mockData);
+      expect(mockFetch).toHaveBeenCalledWith('/api/housing/labour-market/family-type');
+    });
 
-it("handles fetch failure for labour market family types data", async () => {
-  fetchMock.mockResponseOnce('', {status: 500});
+    it('handles fetch failure for labour market family types data', async () => {
+      mockFetch.mockResolvedValueOnce({ok: false, status: 500});
 
-  await expect(getLabourMarketFamilyTypes()).rejects.toThrow('HTTP error');
+      await expect(getLabourMarketFamilyTypes()).rejects.toThrow('HTTP error');
+    });
+  });
 });

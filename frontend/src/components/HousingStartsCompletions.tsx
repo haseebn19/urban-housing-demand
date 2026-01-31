@@ -40,12 +40,12 @@ interface Props {
 
 const COLORS = {
   Toronto: {
-    starts: {bg: 'rgba(34, 197, 94, 0.6)', border: '#22c55e'},
-    completions: {bg: 'rgba(34, 197, 94, 0.9)', border: '#16a34a'},
+    starts: {bg: 'rgba(34, 197, 94, 0.7)', border: '#22c55e'},
+    completions: {bg: 'rgba(249, 115, 22, 0.7)', border: '#f97316'},
   },
   Hamilton: {
-    starts: {bg: 'rgba(59, 130, 246, 0.6)', border: '#3b82f6'},
-    completions: {bg: 'rgba(59, 130, 246, 0.9)', border: '#2563eb'},
+    starts: {bg: 'rgba(59, 130, 246, 0.7)', border: '#3b82f6'},
+    completions: {bg: 'rgba(168, 85, 247, 0.7)', border: '#a855f7'},
   },
 };
 

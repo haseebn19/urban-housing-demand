@@ -36,7 +36,7 @@ docker compose -f compose.test.yaml up --build
 ```
 
 This runs:
-- Frontend: Jest + React Testing Library
+- Frontend: Vitest + React Testing Library
 - Backend: JUnit 5 + Mockito
 - Ingestor: pytest
 
@@ -95,7 +95,7 @@ docker compose exec database mysql -u root -p"$DB_PASSWORD" urban_housing_demand
 GitHub Actions runs on every push:
 
 1. **Lint** - ESLint, Checkstyle, Ruff
-2. **Test** - Jest, JUnit, pytest
+2. **Test** - Vitest, JUnit, pytest
 3. **Build** - Docker images
 
 See `.github/workflows/ci.yml`

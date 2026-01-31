@@ -20,7 +20,7 @@ const ProductPitch: React.FC = () => {
 
       <div className="pitch__grid">
         <div className="pitch__card">
-          <h2 className="pitch__card-title">📊 Key Objectives</h2>
+          <h2 className="pitch__card-title">Key Objectives</h2>
           <ul className="pitch__list">
             <li>Analyze <strong>housing and employment data</strong> for Hamilton and Toronto</li>
             <li>Identify <strong>housing demand vs. supply gaps</strong> across demographic groups</li>
@@ -29,7 +29,7 @@ const ProductPitch: React.FC = () => {
         </div>
 
         <div className="pitch__card">
-          <h2 className="pitch__card-title">🎯 Our Approach</h2>
+          <h2 className="pitch__card-title">Our Approach</h2>
           <ul className="pitch__list">
             <li>Analyze housing trends and <strong>demographic shifts</strong></li>
             <li>Compare data between <strong>two major cities</strong></li>
@@ -38,7 +38,7 @@ const ProductPitch: React.FC = () => {
         </div>
 
         <div className="pitch__card">
-          <h2 className="pitch__card-title">👥 Target Audiences</h2>
+          <h2 className="pitch__card-title">Target Audiences</h2>
           <ul className="pitch__list">
             <li><strong>Real estate investors</strong> seeking market insights</li>
             <li><strong>Developers</strong> planning new projects</li>
@@ -47,7 +47,7 @@ const ProductPitch: React.FC = () => {
         </div>
 
         <div className="pitch__card">
-          <h2 className="pitch__card-title">📈 Data Sources</h2>
+          <h2 className="pitch__card-title">Data Sources</h2>
           <ul className="pitch__list">
             <li>Housing starts and completions data</li>
             <li>Labour market statistics by occupation</li>

@@ -3,13 +3,10 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Install build dependencies for native modules (canvas)
-RUN apk add --no-cache python3 make g++ cairo-dev pango-dev jpeg-dev giflib-dev
-
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (use install to generate lockfile if needed)
+# Install dependencies
 RUN npm install
 
 # Copy source files
@@ -24,8 +21,8 @@ FROM nginx:alpine AS production
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy built app from build stage
-COPY --from=build /app/build /usr/share/nginx/html
+# Copy built app from build stage (Vite outputs to dist/)
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S appgroup && \

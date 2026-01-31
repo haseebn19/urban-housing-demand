@@ -35,7 +35,7 @@ const LabourMarketOccupations: React.FC<Props> = ({city}) => {
   const [error, setError] = useState<string | null>(null);
 
   const colors = COLORS[city];
-  const chartOptions = useChartOptions({title: `${city} Occupations`, rotateXLabels: true});
+  const chartOptions = useChartOptions({title: `${city} Occupations`, horizontal: true});
 
   useEffect(() => {
     let isMounted = true;
@@ -102,6 +102,7 @@ const LabourMarketOccupations: React.FC<Props> = ({city}) => {
       loading={loading}
       error={error}
       hasData={hasData}
+      tall
     >
       {hasData && <Bar data={chartData} options={chartOptions} />}
     </ChartCard>

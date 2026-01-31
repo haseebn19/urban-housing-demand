@@ -1,41 +1,41 @@
-import React from "react";
-import {render, screen, waitFor} from "@testing-library/react";
-import "@testing-library/jest-dom";
-import HousingStartsCompletions from "../components/HousingStartsCompletions";
-import {ThemeProvider} from "../ThemeContext";
-import * as housingService from "../services/housingService";
+import {describe, it, expect, vi, beforeAll, beforeEach} from 'vitest';
+import {render, screen, waitFor} from '@testing-library/react';
+import HousingStartsCompletions from '../components/HousingStartsCompletions';
+import {ThemeProvider} from '../ThemeContext';
+import * as housingService from '../services/housingService';
 
 // Mock ResizeObserver for Chart.js
 beforeAll(() => {
   class ResizeObserver {
-    observe(): void { /* noop */}
-    unobserve(): void { /* noop */}
-    disconnect(): void { /* noop */}
+    observe(): void { /* noop */ }
+    unobserve(): void { /* noop */ }
+    disconnect(): void { /* noop */ }
   }
-  // @ts-expect-error - ResizeObserver mock for tests
-  global.ResizeObserver = ResizeObserver;
+  vi.stubGlobal('ResizeObserver', ResizeObserver);
 });
 
 // Mock the housing service
-jest.mock("../services/housingService");
-const mockedService = housingService as jest.Mocked<typeof housingService>;
+vi.mock('../services/housingService');
+const mockedService = housingService as unknown as {
+  getHousingTotalStartsCompletions: ReturnType<typeof vi.fn>;
+};
 
-describe("HousingStartsCompletions", () => {
+describe('HousingStartsCompletions', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Mock localStorage
-    Object.defineProperty(window, "localStorage", {
+    Object.defineProperty(window, 'localStorage', {
       value: {
-        getItem: jest.fn(() => "light"),
-        setItem: jest.fn(),
+        getItem: vi.fn(() => 'light'),
+        setItem: vi.fn(),
       },
       writable: true,
     });
   });
 
-  test("renders with Hamilton city prop", async () => {
+  it('renders with Hamilton city prop', async () => {
     mockedService.getHousingTotalStartsCompletions.mockResolvedValue([
-      {city: "Hamilton", year: 2023, month: 1, totalStarts: 100, totalCompletions: 80},
+      {city: 'Hamilton', year: 2023, month: 1, totalStarts: 100, totalCompletions: 80},
     ]);
 
     render(
@@ -51,9 +51,9 @@ describe("HousingStartsCompletions", () => {
     });
   });
 
-  test("renders with Toronto city prop", async () => {
+  it('renders with Toronto city prop', async () => {
     mockedService.getHousingTotalStartsCompletions.mockResolvedValue([
-      {city: "Toronto", year: 2023, month: 1, totalStarts: 200, totalCompletions: 150},
+      {city: 'Toronto', year: 2023, month: 1, totalStarts: 200, totalCompletions: 150},
     ]);
 
     render(
@@ -65,9 +65,9 @@ describe("HousingStartsCompletions", () => {
     expect(screen.getByText(/Housing Starts & Completions \(Toronto\)/i)).toBeInTheDocument();
   });
 
-  test("shows loading state initially", () => {
+  it('shows loading state initially', () => {
     mockedService.getHousingTotalStartsCompletions.mockImplementation(
-      () => new Promise(() => { /* never resolves */})
+      () => new Promise(() => { /* never resolves */ })
     );
 
     render(
@@ -79,7 +79,7 @@ describe("HousingStartsCompletions", () => {
     expect(screen.getByText(/Loading data/i)).toBeInTheDocument();
   });
 
-  test("handles empty data gracefully", async () => {
+  it('handles empty data gracefully', async () => {
     mockedService.getHousingTotalStartsCompletions.mockResolvedValue([]);
 
     render(
@@ -93,10 +93,10 @@ describe("HousingStartsCompletions", () => {
     });
   });
 
-  test("filters data correctly by city", async () => {
+  it('filters data correctly by city', async () => {
     mockedService.getHousingTotalStartsCompletions.mockResolvedValue([
-      {city: "Hamilton", year: 2023, month: 1, totalStarts: 100, totalCompletions: 80},
-      {city: "Toronto", year: 2023, month: 1, totalStarts: 200, totalCompletions: 150},
+      {city: 'Hamilton', year: 2023, month: 1, totalStarts: 100, totalCompletions: 80},
+      {city: 'Toronto', year: 2023, month: 1, totalStarts: 200, totalCompletions: 150},
     ]);
 
     render(
@@ -107,22 +107,22 @@ describe("HousingStartsCompletions", () => {
 
     // Component should render without error and show Hamilton data
     await waitFor(() => {
-      const container = screen.getByTestId("housing-starts-hamilton");
+      const container = screen.getByTestId('housing-starts-hamilton');
       expect(container).toBeInTheDocument();
     });
   });
 
-  test("applies dark theme correctly", async () => {
-    Object.defineProperty(window, "localStorage", {
+  it('applies dark theme correctly', async () => {
+    Object.defineProperty(window, 'localStorage', {
       value: {
-        getItem: jest.fn(() => "dark"),
-        setItem: jest.fn(),
+        getItem: vi.fn(() => 'dark'),
+        setItem: vi.fn(),
       },
       writable: true,
     });
 
     mockedService.getHousingTotalStartsCompletions.mockResolvedValue([
-      {city: "Hamilton", year: 2023, month: 1, totalStarts: 100, totalCompletions: 80},
+      {city: 'Hamilton', year: 2023, month: 1, totalStarts: 100, totalCompletions: 80},
     ]);
 
     render(
@@ -131,13 +131,13 @@ describe("HousingStartsCompletions", () => {
       </ThemeProvider>
     );
 
-    const container = screen.getByTestId("housing-starts-hamilton");
-    expect(container).toHaveClass("chart-card");
+    const container = screen.getByTestId('housing-starts-hamilton');
+    expect(container).toHaveClass('chart-card');
   });
 
-  test("applies light theme correctly", async () => {
+  it('applies light theme correctly', async () => {
     mockedService.getHousingTotalStartsCompletions.mockResolvedValue([
-      {city: "Hamilton", year: 2023, month: 1, totalStarts: 100, totalCompletions: 80},
+      {city: 'Hamilton', year: 2023, month: 1, totalStarts: 100, totalCompletions: 80},
     ]);
 
     render(
@@ -146,7 +146,7 @@ describe("HousingStartsCompletions", () => {
       </ThemeProvider>
     );
 
-    const container = screen.getByTestId("housing-starts-hamilton");
-    expect(container).toHaveClass("chart-card");
+    const container = screen.getByTestId('housing-starts-hamilton');
+    expect(container).toHaveClass('chart-card');
   });
 });
