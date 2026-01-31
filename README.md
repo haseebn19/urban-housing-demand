@@ -76,15 +76,15 @@ Output: Docker images for frontend, backend, database, and ingestor services.
 
 ## Documentation
 
-Full documentation is in the **`docs/`** folder (and can be published as a GitHub Wiki):
+Full documentation is available on the [Wiki](https://github.com/haseebn19/urban-housing-demand/wiki):
 
 | Doc | Description |
 |-----|-------------|
-| [Getting Started](docs/Getting-Started.md) | Installation, env vars, basic commands |
-| [Architecture](docs/Architecture.md) | System design and components |
-| [API Reference](docs/API-Reference.md) | REST endpoints |
-| [Database Schema](docs/Database-Schema.md) | Tables and mappings |
-| [Development Guide](docs/Development-Guide.md) | Contributing, local dev, CI/CD |
+| [Getting Started](https://github.com/haseebn19/urban-housing-demand/wiki/Getting-Started) | Installation, env vars, basic commands |
+| [Architecture](https://github.com/haseebn19/urban-housing-demand/wiki/Architecture) | System design and components |
+| [API Reference](https://github.com/haseebn19/urban-housing-demand/wiki/API-Reference) | REST endpoints |
+| [Database Schema](https://github.com/haseebn19/urban-housing-demand/wiki/Database-Schema) | Tables and mappings |
+| [Development Guide](https://github.com/haseebn19/urban-housing-demand/wiki/Development-Guide) | Contributing, local dev, CI/CD |
 
 ## Tech Stack
 
@@ -104,9 +104,9 @@ urban-housing-demand/
 ├── backend/           # Spring Boot API
 ├── database/          # SQL schema & seed data
 ├── ingestor/          # Python data loader
-├── docs/              # Documentation source
+├── docs/              # Screenshots for README
 ├── .env.example       # Example env (copy to .env)
-└── compose.yaml      # Docker orchestration
+└── compose.yaml       # Docker orchestration
 ```
 
 ## Contributing
@@ -126,4 +126,8 @@ urban-housing-demand/
 
 ## License
 
-Developed for CIS*4900 at the University of Guelph.
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+*Originally developed for CIS\*4900 at the University of Guelph.*
