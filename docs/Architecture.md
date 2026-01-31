@@ -18,10 +18,10 @@ Urban Housing Demand is a full-stack web application with four main components:
 
 ## Components
 
-### Frontend (React + TypeScript)
+### Frontend (React + TypeScript + Vite)
 
 - **Purpose:** Interactive data visualization
-- **Key Libraries:** Chart.js, React 18
+- **Key Libraries:** Chart.js, React 18, Vite
 - **Features:** Dark/light theme, responsive charts
 
 ### Backend (Spring Boot)

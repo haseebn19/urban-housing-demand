@@ -4,11 +4,11 @@
 
 ```
 urban-housing-demand/
-├── frontend/              # React + TypeScript
+├── frontend/              # React + TypeScript + Vite
 │   ├── src/
 │   │   ├── components/    # UI components
 │   │   ├── services/      # API client
-│   │   └── tests/         # Jest tests
+│   │   └── tests/         # Vitest tests
 │   └── Dockerfile
 ├── backend/               # Spring Boot
 │   ├── src/main/java/

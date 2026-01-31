@@ -4,6 +4,14 @@
 
 A full-stack web application for visualizing housing and labour market data for Toronto and Hamilton, Ontario.
 
+## Screenshots
+
+<img src="docs/screenshot-home.jpeg" alt="Home Page" width="600">
+
+<img src="docs/screenshot-housing.jpeg" alt="Housing Data" width="600">
+
+<img src="docs/screenshot-occupations.jpeg" alt="Occupations" width="600">
+
 ## Features
 
 - **Housing Data Visualization**: Track housing starts and completions over time
@@ -12,39 +20,59 @@ A full-stack web application for visualizing housing and labour market data for 
 - **Immigration Trends**: Monitor immigration patterns in both cities
 - **Dark/Light Theme**: Toggle between themes for comfortable viewing
 
-## Quick Start
+## Prerequisites
 
-**Prerequisites:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+## Installation
 
 ```bash
-# Clone and start
 git clone https://github.com/haseebn19/urban-housing-demand.git
 cd urban-housing-demand
+```
 
+## Usage
+
+```bash
 # Set required database password (no default for security)
 export DB_PASSWORD=your_secure_password   # Linux/macOS
 # Or: $env:DB_PASSWORD="your_secure_password"  # PowerShell
 
+# Start application
 docker compose up -d
-
-# Open http://localhost:3000
 ```
 
-## Commands
+Open http://localhost:3000
+
+## Development
+
+### Testing
 
 ```bash
-# Start application (DB_PASSWORD required)
-docker compose up -d
-
 # Run all tests
 docker compose -f compose.test.yaml up --build
-
-# Stop application
-docker compose down
-
-# View logs
-docker compose logs -f
 ```
+
+### Linting
+
+```bash
+# Frontend (ESLint)
+cd frontend && npm run lint
+
+# Backend (Checkstyle)
+cd backend && ./gradlew checkstyleMain
+
+# Ingestor (Ruff)
+cd ingestor && ruff check .
+```
+
+## Building
+
+```bash
+docker compose build
+```
+
+Output: Docker images for frontend, backend, database, and ingestor services.
 
 ## Documentation
 
@@ -88,6 +116,13 @@ urban-housing-demand/
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## Credits
+
+- [React](https://react.dev/) - Frontend framework
+- [Chart.js](https://www.chartjs.org/) - Data visualization
+- [Spring Boot](https://spring.io/projects/spring-boot) - Backend framework
+- [MariaDB](https://mariadb.org/) - Database
 
 ## License
 

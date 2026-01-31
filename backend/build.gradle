@@ -8,7 +8,10 @@ plugins {
 
 group = 'com.example.cis4900.spring'
 version = '1.0'
-archivesBaseName = 'urban-housing-demand'
+
+base {
+    archivesName = 'urban-housing-demand'
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -46,8 +49,15 @@ dependencies {
     testRuntimeOnly 'com.h2database:h2:2.2.224'
 }
 
+testing {
+    suites {
+        test {
+            useJUnitJupiter()
+        }
+    }
+}
+
 test {
-    useJUnitPlatform()
     finalizedBy jacocoTestReport
 }
 

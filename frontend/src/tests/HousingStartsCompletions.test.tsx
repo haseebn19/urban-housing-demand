@@ -63,6 +63,11 @@ describe('HousingStartsCompletions', () => {
     );
 
     expect(screen.getByText(/Housing Starts & Completions \(Toronto\)/i)).toBeInTheDocument();
+    
+    // Wait for async state updates to complete
+    await waitFor(() => {
+      expect(mockedService.getHousingTotalStartsCompletions).toHaveBeenCalled();
+    });
   });
 
   it('shows loading state initially', () => {
@@ -131,8 +136,10 @@ describe('HousingStartsCompletions', () => {
       </ThemeProvider>
     );
 
-    const container = screen.getByTestId('housing-starts-hamilton');
-    expect(container).toHaveClass('chart-card');
+    await waitFor(() => {
+      const container = screen.getByTestId('housing-starts-hamilton');
+      expect(container).toHaveClass('chart-card');
+    });
   });
 
   it('applies light theme correctly', async () => {
@@ -146,7 +153,9 @@ describe('HousingStartsCompletions', () => {
       </ThemeProvider>
     );
 
-    const container = screen.getByTestId('housing-starts-hamilton');
-    expect(container).toHaveClass('chart-card');
+    await waitFor(() => {
+      const container = screen.getByTestId('housing-starts-hamilton');
+      expect(container).toHaveClass('chart-card');
+    });
   });
 });
