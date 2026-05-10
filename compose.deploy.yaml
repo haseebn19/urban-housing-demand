@@ -87,9 +87,9 @@ services:
     build: ./ingestor
     environment:
       - DB_HOST=database
-      - DB_DATABASE=${DB_DATABASE:-template_db}
+      - DB_DATABASE=${DB_DATABASE:-urban_housing_demand}
       - DB_USER=${DB_USER:-root}
-      - DB_PASSWORD=${DB_PASSWORD:-pwd}
+      - DB_PASSWORD=${DB_PASSWORD:?DB_PASSWORD is required}
     depends_on:
       database:
         condition: service_healthy
