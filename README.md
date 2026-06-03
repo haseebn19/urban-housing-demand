@@ -6,11 +6,11 @@ A full-stack web application for visualizing housing and labour market data for 
 
 ## Screenshots
 
-<img src="docs/screenshot-home.jpeg" alt="Home Page" width="600">
+<img src="docs/screenshot-home.jpeg" alt="Home Page" width="500">
 
-<img src="docs/screenshot-housing.jpeg" alt="Housing Data" width="600">
+<img src="docs/screenshot-housing.jpeg" alt="Housing Data" width="500">
 
-<img src="docs/screenshot-occupations.jpeg" alt="Occupations" width="600">
+<img src="docs/screenshot-occupations.jpeg" alt="Occupations" width="500">
 
 ## Features
 
