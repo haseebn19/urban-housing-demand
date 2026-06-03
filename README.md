@@ -119,6 +119,15 @@ urban-housing-demand/
 
 ## Credits
 
+### Development Team
+- Haseeb Niazi
+- Athina Manolakou
+- Ricardo Lazo
+- Samantha Hilborn
+- Mohammad Shoib Wahab
+- Adam Fischer
+
+### Third-Party Libraries
 - [React](https://react.dev/) - Frontend framework
 - [Chart.js](https://www.chartjs.org/) - Data visualization
 - [Spring Boot](https://spring.io/projects/spring-boot) - Backend framework
