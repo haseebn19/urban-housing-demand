@@ -19,6 +19,15 @@ class Database:
     # CMA codes for filtering
     VALID_CMAS = ["Toronto", "Hamilton"]
 
+    # Valid tables for SQL injection checks
+    VALID_TABLES = [
+        "housing_starts_completions",
+        "housing_under_construction",
+        "apartment_starts",
+        "apartment_completions",
+        "labour_market"
+    ]
+
     def __init__(self):
         """Initialize database connection settings from environment variables."""
         self.host = os.getenv("DB_HOST", "localhost")
@@ -106,6 +115,8 @@ class Database:
                     time.sleep(self.retry_delay)
                 else:
                     raise
+
+        raise pymysql.MySQLError("No connection attempts made (max_retries <= 0)")
 
     def close(self) -> None:
         """Close the database connection."""
@@ -463,15 +474,7 @@ class Database:
     def get_record_count(self, table: str) -> int:
         """Get the number of records in a table."""
         # Use parameterized approach to prevent SQL injection
-        valid_tables = [
-            "housing_starts_completions",
-            "housing_under_construction",
-            "apartment_starts",
-            "apartment_completions",
-            "labour_market"
-        ]
-
-        if table not in valid_tables:
+        if table not in self.VALID_TABLES:
             raise ValueError(f"Invalid table name: {table}")
 
         conn = self.connect()
@@ -487,15 +490,7 @@ class Database:
     def get_all_data(self, table: str) -> list[dict[str, Any]]:
         """Retrieve all records from a table for Toronto and Hamilton."""
         # Validate table name to prevent SQL injection
-        valid_tables = [
-            "housing_starts_completions",
-            "housing_under_construction",
-            "apartment_starts",
-            "apartment_completions",
-            "labour_market"
-        ]
-
-        if table not in valid_tables:
+        if table not in self.VALID_TABLES:
             raise ValueError(f"Invalid table name: {table}")
 
         conn = self.connect()
