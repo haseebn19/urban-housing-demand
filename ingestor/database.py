@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Any
+from typing import Any, ClassVar
 
 import pymysql
 import requests
@@ -17,10 +17,10 @@ class Database:
     """Database connection and operations handler."""
 
     # CMA codes for filtering
-    VALID_CMAS = ["Toronto", "Hamilton"]
+    VALID_CMAS: ClassVar[list[str]] = ["Toronto", "Hamilton"]
 
     # Valid tables for SQL injection checks
-    VALID_TABLES = [
+    VALID_TABLES: ClassVar[list[str]] = [
         "housing_starts_completions",
         "housing_under_construction",
         "apartment_starts",

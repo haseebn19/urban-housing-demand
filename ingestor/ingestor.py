@@ -10,8 +10,10 @@ from __future__ import annotations
 
 import json
 import os
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 import pymysql
 
@@ -66,10 +68,10 @@ def run_ingestor() -> None:
                 errors.append(f"{table_name}: Table missing")
                 print(f"  -> Warning: Table `{table_name}` does not exist. Run setup.sql first.")
             else:
-                errors.append(f"{table_name}: {str(e)}")
+                errors.append(f"{table_name}: {e!s}")
                 print(f"  -> Error: {e}")
         except Exception as e:
-            errors.append(f"{table_name}: {str(e)}")
+            errors.append(f"{table_name}: {e!s}")
             print(f"  -> Error: {e}")
 
     # Summary

@@ -4,13 +4,14 @@ Unit tests for the Urban Housing Demand data ingestor.
 
 import os
 import sys
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pymysql
 import pytest
 
 # Ensure the parent directory is in sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, str(Path(__file__).parent.parent.resolve()))
 
 # Set required environment variable for tests before importing Database
 os.environ.setdefault("DB_PASSWORD", "test_password")
