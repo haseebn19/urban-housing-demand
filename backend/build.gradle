@@ -42,8 +42,8 @@ dependencies {
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-core:5.23.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:6.1.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:6.1.2'
     
     // H2 database for integration tests
     testRuntimeOnly 'com.h2database:h2:2.4.240'
