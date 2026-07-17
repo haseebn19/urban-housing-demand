@@ -34,19 +34,19 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     
     // Database - use newer MySQL connector artifact
-    runtimeOnly 'com.mysql:mysql-connector-j:9.1.0'
+    runtimeOnly 'com.mysql:mysql-connector-j:9.7.0'
     
     // API Documentation
     runtimeOnly 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.mockito:mockito-core:5.15.2'
+    testImplementation 'org.mockito:mockito-core:5.23.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
     
     // H2 database for integration tests
-    testRuntimeOnly 'com.h2database:h2:2.2.224'
+    testRuntimeOnly 'com.h2database:h2:2.4.240'
 }
 
 testing {
