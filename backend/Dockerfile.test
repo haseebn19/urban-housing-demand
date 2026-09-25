@@ -1,0 +1,15 @@
+FROM eclipse-temurin:21-jdk-jammy
+
+WORKDIR /app
+
+COPY gradlew .
+COPY gradle/wrapper ./gradle/wrapper
+COPY build.gradle .
+COPY config ./config
+COPY src ./src
+
+RUN chmod +x gradlew
+
+# Run checkstyle (lint) and compile tests to verify they're valid
+# Full Spring tests run in CI with proper database context
+CMD ["./gradlew", "checkstyleMain", "compileTestJava", "--no-daemon"]

@@ -1,0 +1,19 @@
+.chart-card { max-width: 1000px; margin: 0 auto 32px; padding: 24px; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; }
+.chart-card:has(.chart-card__chart--tall) { max-width: 1200px; }
+.chart-card__title { margin: 0 0 24px; font-size: 1.25rem; font-weight: 600; text-align: left; }
+.chart-card__content { min-height: 400px; display: flex; align-items: center; justify-content: center; }
+.chart-card__chart { width: 100%; height: 400px; }
+.chart-card__chart--tall { height: 800px; padding-left: 20px; }
+.chart-card__status { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 40px; }
+.chart-card__status p { margin: 0; font-size: 1rem; }
+.chart-card__status--error p { color: #e56c6c; font-weight: 500; }
+.chart-card__spinner { width: 40px; height: 40px; border: 3px solid transparent; border-top-color: var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 768px) {
+  .chart-card { margin-bottom: 20px; padding: 16px; }
+  .chart-card__title { font-size: 1.1rem; }
+  .chart-card__chart { height: 300px; }
+  .chart-card__chart--tall { height: 800px; }
+  .chart-card__content { min-height: 300px; }
+}
+@media (prefers-reduced-motion: reduce) { .chart-card__spinner { animation: none; } }

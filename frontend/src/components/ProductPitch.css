@@ -1,0 +1,16 @@
+.pitch { max-width: 1000px; margin: 0 auto; padding: 32px 0; }
+.pitch__header { margin-bottom: 28px; }
+.pitch__title { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 600; margin-bottom: 12px; letter-spacing: -.03em; }
+.pitch__subtitle { color: var(--text-secondary); font-size: 1.1rem; }
+.pitch__intro { max-width: 760px; line-height: 1.8; margin-bottom: 36px; }
+.pitch__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 48px; }
+.pitch__card { padding-top: 20px; border-top: 1px solid var(--border-color); }
+.pitch__card-title { font-size: 1.1rem; margin-bottom: 12px; }
+.pitch__list { padding-left: 18px; color: var(--text-secondary); }
+.pitch__list li { margin-bottom: 8px; line-height: 1.6; font-size: .95rem; }
+.pitch__cta { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+.pitch__cta p { font-size: .9rem; }
+@media (max-width: 640px) {
+  .pitch { padding-block: 16px; }
+  .pitch__grid { grid-template-columns: 1fr; }
+}
