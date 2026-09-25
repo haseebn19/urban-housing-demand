@@ -1,0 +1,16 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+
+COPY requirements.txt requirements-dev.txt ./
+RUN pip install --no-cache-dir --root-user-action=ignore -r requirements-dev.txt
+
+COPY . .
+# The tests write coverage data, so the user needs to own the folder
+RUN chown -R appuser:appgroup /app
+USER appuser
+
+# Run the same checks as CI: lint and formatting, then the tests with coverage
+CMD ["sh", "-c", "ruff check . && ruff format --check . && python -m pytest tests/ -v --cov=. --cov-report=term-missing"]

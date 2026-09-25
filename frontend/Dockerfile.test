@@ -1,0 +1,17 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+# The tests write coverage data, so the user needs to own the folder
+RUN chown -R appuser:appgroup /app
+USER appuser
+
+# Run the same checks as CI: lint, formatting, and types, then the tests with coverage
+CMD ["sh", "-c", "npm run lint && npm run format:check && npm run type-check && npm test -- --coverage"]

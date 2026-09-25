@@ -1,0 +1,11 @@
+FROM eclipse-temurin:21-jdk-jammy
+
+WORKDIR /app
+
+COPY gradlew build.gradle ./
+COPY gradle/wrapper ./gradle/wrapper
+COPY config ./config
+COPY src ./src
+
+# Run Checkstyle, the formatting check, and the tests (which use an in-memory H2 database)
+CMD ["./gradlew", "check", "--no-daemon"]

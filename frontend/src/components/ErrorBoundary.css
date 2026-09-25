@@ -1,0 +1,47 @@
+/* Shown in place of the dashboard when it fails to render */
+.error-boundary {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 16px;
+    text-align: center;
+}
+
+.error-boundary h1 {
+    margin-bottom: 8px;
+    color: var(--error-color);
+}
+
+.error-boundary p {
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+}
+
+.error-boundary details {
+    text-align: left;
+}
+
+.error-boundary summary {
+    cursor: pointer;
+    color: var(--accent-color);
+}
+
+.error-boundary pre {
+    margin-top: 8px;
+    padding: 15px;
+    overflow: auto;
+    font-size: 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.error-boundary button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: var(--bg-primary);
+    background: var(--accent-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}

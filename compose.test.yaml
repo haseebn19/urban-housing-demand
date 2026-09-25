@@ -1,0 +1,18 @@
+# Runs the checks and tests of the frontend, backend, and ingestor, each in its own container.
+# Usage: docker compose -f compose.test.yaml up --build
+
+services:
+  test-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.test
+
+  test-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+
+  test-ingestor:
+    build:
+      context: ./ingestor
+      dockerfile: Dockerfile.test
